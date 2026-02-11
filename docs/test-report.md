@@ -1,9 +1,10 @@
 # Test Report - OFX Reader
 
-**Date:** 2026-01-29  
+**Date:** 2026-02-11 (Updated)  
 **Tested by:** Implementer Agent  
 **Application:** index.html  
-**Test Environment:** macOS, Chrome/Safari, localhost:8000
+**Test Environment:** macOS, Chrome/Safari, localhost:8000  
+**Last Update:** Enhanced Portuguese character encoding (2026-02-11)
 
 ---
 
@@ -110,10 +111,32 @@ All 6 sample OFX files present in workspace:
 - **Status:** PASS
 
 ### Test 5: Portuguese Character Encoding
-- **Test Files:** All files with special characters
-- **Expected:** Display ç, ã, á, é, í, ó, ú correctly
-- **Actual:** ✅ `fixPortugueseEncoding()` maps all corruption patterns
-- **Status:** PASS
+
+**Test Files:** All files with special characters, especially SICOOB files with CHARSET:1252
+
+**Before Enhancement:**
+- Files with UTF-8 encoding: ✅ Worked correctly
+- Files with CHARSET:1252: ❌ Displayed � replacement characters
+
+**After Enhancement:**
+- UTF-8 double-encoding patterns: ✅ Fixed (Ã§ → ç, Ã£ → ã, etc.)
+- Replacement characters (�): ✅ Fixed with context-aware mapping
+- Binary read fallback: ✅ Properly decodes Windows-1252 files
+- Common banking terms: ✅ All display correctly
+
+**Test Examples:**
+```
+Before: D�B.CONV.TRIBUTOS FEDERAIS - RFB
+After:  DÉB.CONV.TRIBUTOS FEDERAIS - RFB ✅
+
+Before: D�BITO PACOTE SERVI�OS
+After:  DÉBITO PACOTE SERVIÇOS ✅
+
+Before: TRANSFER�NCIA
+After:  TRANSFERÊNCIA ✅
+```
+
+**Status:** ✅ PASS (Enhanced - 2026-02-11)
 
 ### Test 6: Date Formatting
 - **Test Input:** Various OFX date formats (with/without timezone)
@@ -267,7 +290,21 @@ All 6 sample OFX files present in workspace:
 
 ## Bugs Found
 
-**NONE** - Zero bugs identified during testing.
+### Bug #1: Portuguese Characters with Replacement Characters (�) - FIXED
+
+**Reported:** 2026-02-11  
+**Status:** ✅ FIXED  
+**Files Affected:** SICOOB files with CHARSET:1252 declaration  
+**Severity:** HIGH (data corruption)
+
+**Description:**
+Files with `CHARSET:1252` and `ENCODING:USASCII` contained Windows-1252 bytes that were misread as UTF-8, resulting in � (replacement character U+FFFD) for all accented Portuguese characters.
+
+**Fix:**
+- Enhanced `fixPortugueseEncoding()` with 3-pattern detection
+- Added binary read fallback in `handleFileUpload()`
+- Context-aware mapping for common banking terms
+- See [debug-report.md](debug-report.md) for full details
 
 ---
 
