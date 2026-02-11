@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Leitor de arquivos OFX de bancos brasileiros">
+  <title>OFX Reader - Leitor de Extratos Bancários</title>
+  <style>
+/* ═══════════════════════════════════════════════════════════
+   OFX READER - COMPLETE STYLESHEET
+   Dark Blue Professional Theme with Medium Glow
+   ═══════════════════════════════════════════════════════════ */
+
+/* ────────────────── RESET ────────────────── */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ────────────────── CSS VARIABLES ────────────────── */
+
+:root {
+  /* ── Dark Blue Backgrounds ── */
+  --bg-base: #0a1929;
+  --bg-primary: #0d1b2a;
+  --bg-secondary: #132f4c;
+  --bg-tertiary: #1e3a5f;
+  --bg-elevated: #0f2740;
+  --bg-hover: rgba(25, 118, 210, 0.08);
+
+  /* ── Borders ── */
+  --border-subtle: rgba(144, 202, 249, 0.08);
+  --border-default: #2c5282;
+  --border-strong: #3d6ca3;
+  --border-focus: #1976d2;
+
+  /* ── Text Colors ── */
+  --text-primary: #e3f2fd;
+  --text-secondary: #90caf9;
+  --text-tertiary: #64b5f6;
+  --text-muted: #5a7a99;
+  --text-inverse: #0a1929;
+
+  /* ── Accent & Brand Colors ── */
+  --accent: #1976d2;
+  --accent-rgb: 25, 118, 210;
+  --accent-light: #42a5f5;
+  --accent-lighter: #64b5f6;
+  --accent-dark: #1565c0;
+  --accent-darkest: #0d47a1;
+
+  /* ── Semantic Colors ── */
+  --color-success: #4caf50;
+  --color-success-rgb: 76, 175, 80;
+  --color-error: #f44336;
+  --color-error-rgb: 244, 67, 54;
+  --color-warning: #ff9800;
+  --color-info: #42a5f5;
+
+  /* ── Typography ── */
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+  --font-size-xs: 0.6875rem;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* ── Spacing (4px base unit) ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* ── Border Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5), 0 6px 10px rgba(0, 0, 0, 0.3);
+
+  /* ── Glow Effects (Medium Intensity) ── */
+  --glow-xs: 0 0 10px rgba(var(--accent-rgb), 0.2);
+  --glow-sm: 0 0 20px rgba(var(--accent-rgb), 0.25), 0 0 40px rgba(var(--accent-rgb), 0.1);
+  --glow-md: 0 0 30px rgba(var(--accent-rgb), 0.35), 0 0 60px rgba(var(--accent-rgb), 0.15);
+  --glow-focus: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
+
+  /* ── Transitions (Moderate) ── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.6, 1);
+
+  /* ── Layout ── */
+  --max-content-width: 1400px;
+  --container-padding: var(--space-6);
+  --header-height: 80px;
+}
+
+/* ────────────────── BASE STYLES ────────────────── */
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  background: linear-gradient(180deg, var(--bg-base) 0%, #050e1a 100%);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+}
+
+h1 { font-size: var(--font-size-2xl); }
+h2 { font-size: var(--font-size-xl); }
+h3 { font-size: var(--font-size-lg); }
+
+p {
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ── Accessibility ── */
+
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-focus);
+  border-radius: var(--radius-sm);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ────────────────── LAYOUT ────────────────── */
+
+.app-container {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  padding: var(--container-padding);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* ────────────────── HEADER ────────────────── */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-4);
+}
+
+.app-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  margin-top: var(--space-2);
+}
+
+/* ────────────────── UPLOAD ZONE ────────────────── */
+
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.upload-zone {
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10) var(--space-8);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: var(--bg-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(var(--accent-rgb), 0.1);
+  transition: width var(--transition-slow), height var(--transition-slow);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.05);
+  box-shadow: var(--glow-sm);
+  transform: translateY(-2px);
+}
+
+.upload-zone:hover::before,
+.upload-zone.dragover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: var(--accent);
+  margin-bottom: var(--space-4);
+  display: block;
+}
+
+.upload-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.upload-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--space-4);
+}
+
+.upload-hint {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+.file-input {
+  display: none;
+}
+
+/* ────────────────── LOADING STATE ────────────────── */
+
+.loading-container {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.loading-container.visible {
+  display: flex;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+}
+
+/* ────────────────── ERROR MESSAGE ────────────────── */
+
+.error-message {
+  display: none;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: rgba(var(--color-error-rgb), 0.1);
+  border: 1px solid rgba(var(--color-error-rgb), 0.3);
+  border-left: 4px solid var(--color-error);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+}
+
+.error-message.visible {
+  display: flex;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.error-text {
+  flex: 1;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ────────────────── DATA SECTION ────────────────── */
+
+.data-section {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.data-section.visible {
+  display: flex;
+}
+
+/* ────────────────── METADATA CARDS ────────────────── */
+
+.metadata-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-4);
+}
+
+.metadata-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.metadata-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.metadata-card:hover {
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.metadata-card:hover::before {
+  opacity: 1;
+}
+
+.card-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.card-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.card-value.highlight {
+  color: var(--accent-light);
+}
+
+.card-subvalue {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--space-1);
+}
+
+/* ────────────────── TRANSACTION TABLE ────────────────── */
+
+.transactions-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.table-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
+}
+
+.transaction-table thead {
+  background: var(--bg-tertiary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.transaction-table th {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.transaction-table th.align-right {
+  text-align: right;
+}
+
+.transaction-table tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color var(--transition-fast);
+}
+
+.transaction-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.transaction-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.transaction-table td {
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-table td.date-cell {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.transaction-table td.amount-cell {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+}
+
+.transaction-table td.amount-cell.credit {
+  color: var(--color-success);
+}
+
+.transaction-table td.amount-cell.debit {
+  color: var(--color-error);
+}
+
+.transaction-table td.description-cell {
+  max-width: 600px;
+  color: var(--text-primary);
+}
+
+/* Transaction count badge */
+.transaction-count {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: rgba(var(--accent-rgb), 0.15);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--accent-light);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ────────────────── RESPONSIVE DESIGN ────────────────── */
+
+/* Tablet (768px) */
+@media (max-width: 768px) {
+  :root {
+    --container-padding: var(--space-4);
+    --header-height: 64px;
+  }
+
+  .app-container {
+    padding: var(--space-4);
+    gap: var(--space-6);
+  }
+
+  .app-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .upload-zone {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .metadata-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .metadata-card {
+    padding: var(--space-4);
+  }
+
+  .card-value {
+    font-size: var(--font-size-md);
+  }
+
+  .transaction-table {
+    font-size: var(--font-size-sm);
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .transaction-table td.description-cell {
+    max-width: 300px;
+  }
+}
+
+/* Mobile (480px) */
+@media (max-width: 480px) {
+  .app-container {
+    padding: var(--space-3);
+    gap: var(--space-4);
+  }
+
+  .app-header {
+    padding: var(--space-4) 0;
+  }
+
+  .app-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .upload-zone {
+    padding: var(--space-6) var(--space-3);
+  }
+
+  .upload-title {
+    font-size: var(--font-size-md);
+  }
+
+  .metadata-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title {
+    font-size: var(--font-size-md);
+  }
+
+  /* Stack table on mobile - simplified view */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .transaction-table {
+    min-width: 600px;
+    font-size: var(--font-size-xs);
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    padding: var(--space-2);
+  }
+
+  .transaction-table td.description-cell {
+    max-width: 200px;
+  }
+}
+
+/* ────────────────── PRINT STYLES ────────────────── */
+
+@media print {
+  * {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .app-container {
+    max-width: none;
+    padding: 0;
+  }
+
+  /* Hide interactive elements */
+  .upload-section,
+  .loading-container,
+  .error-message {
+    display: none !important;
+  }
+
+  .app-header {
+    border-bottom: 2px solid #333;
+    margin-bottom: 1rem;
+  }
+
+  .app-title {
+    color: #000;
+    background: none;
+    -webkit-text-fill-color: initial;
+  }
+
+  .metadata-card {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .metadata-card::before {
+    display: none;
+  }
+
+  .card-label {
+    color: #666;
+  }
+
+  .card-value,
+  .card-value.highlight {
+    color: #000;
+  }
+
+  .card-subvalue {
+    color: #666;
+  }
+
+  .table-container {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: none;
+  }
+
+  .transaction-table thead {
+    background: #f5f5f5;
+  }
+
+  .transaction-table th {
+    background: #f5f5f5;
+    color: #333;
+    border-bottom: 2px solid #333;
+  }
+
+  .transaction-table tbody tr {
+    border-bottom: 1px solid #ddd;
+  }
+
+  .transaction-table tbody tr:hover {
+    background: transparent;
+  }
+
+  .transaction-table td {
+    color: #000;
+  }
+
+  .transaction-table td.amount-cell.credit {
+    color: #2e7d32;
+  }
+
+  .transaction-table td.amount-cell.debit {
+    color: #c62828;
+  }
+
+  .transaction-table td.date-cell {
+    color: #666;
+  }
+
+  /* Ensure table fits on page */
+  .transaction-table {
+    font-size: 10pt;
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .section-title {
+    color: #000;
+    margin-top: 1rem;
+  }
+
+  .transaction-count {
+    background: #f5f5f5;
+    border-color: #ddd;
+    color: #333;
+  }
+}
+
+/* ────────────────── UTILITY CLASSES ────────────────── */
+
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: block !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header class="app-header">
+      <div>
+        <h1 class="app-title">OFX Reader</h1>
+        <p class="app-subtitle">Leitor de Extratos Bancários</p>
+      </div>
+    </header>
+
+    <!-- UPLOAD SECTION -->
+    <section class="upload-section">
+      <div class="upload-zone" id="uploadZone">
+        <span class="upload-icon">📄</span>
+        <h2 class="upload-title">Arraste seu arquivo OFX aqui</h2>
+        <p class="upload-subtitle">ou clique para selecionar</p>
+        <p class="upload-hint">Arquivos .ofx de bancos brasileiros</p>
+        <input type="file" id="fileInput" class="file-input" accept=".ofx">
+      </div>
+    </section>
+
+    <!-- LOADING STATE -->
+    <div class="loading-container" id="loadingContainer">
+      <div class="spinner"></div>
+      <span class="loading-text">Processando arquivo...</span>
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    <div class="error-message" id="errorMessage">
+      <span class="error-icon">⚠️</span>
+      <span class="error-text" id="errorText"></span>
+    </div>
+
+    <!-- DATA SECTION (hidden initially) -->
+    <div class="data-section" id="dataSection">
+      
+      <!-- METADATA CARDS -->
+      <section class="metadata-section">
+        <h2 class="section-title">Informações da Conta</h2>
+        <div class="metadata-grid" id="metadataGrid">
+          <!-- Cards will be inserted here by JavaScript -->
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS TABLE -->
+      <section class="transactions-section">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <h2 class="section-title" style="margin-bottom: 0;">Transações</h2>
+          <span class="transaction-count" id="transactionCount">
+            <span>📊</span>
+            <span id="countText">0 transações</span>
+          </span>
+        </div>
+        <div class="table-container">
+          <table class="transaction-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th class="align-right">Valor</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody id="transactionTableBody">
+              <!-- Rows will be inserted here by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+// SECTION 1: CONFIGURATION & CONSTANTS
+// ═══════════════════════════════════════════════════════════
+
+const CONFIG = {
+  fileAccept: '.ofx',
+  dateFormat: 'DD-MM-YYYY',
+  currency: 'BRL',
+  locale: 'pt-BR',
+};
+
+// ═══════════════════════════════════════════════════════════
+// SECTION 2: STATE MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+
+const AppState = {
+  status: 'initial',  // 'initial' | 'loading' | 'success' | 'error'
+  ofxData: null,      // Parsed OFX data (metadata + transactions)
+  error: null,        // Error message string
+  fileName: null,     // Currently loaded file name
+};
+
+/**
+ * Update state and re-render. This is the ONLY way to change the UI.
+ */
+function updateState(newState) {
+  Object.assign(AppState, newState);
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SECTION 3: UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Safely get a nested property. Never throws.
+ */
+function safeGet(obj, path, defaultValue = null) {
+  if (obj == null) return defaultValue;
+  const keys = path.split('.');
+  let current = obj;
+  for (const key of keys) {
+    if (current == null || typeof current !== 'object') return defaultValue;
+    current = current[key];
+  }
+  return current ?? defaultValue;
+}
+
+/**
+ * Parse a number safely. Never returns NaN.
+ */
+function safeNumber(value, defaultValue = 0) {
+  if (value == null) return defaultValue;
+  if (typeof value === 'number') return isNaN(value) ? defaultValue : value;
+  const parsed = parseFloat(String(value).replace(/[^\d.-]/g, ''));
+  return isNaN(parsed) ? defaultValue : parsed;
+}
+
+/**
+ * Safe string — never null/undefined, always trimmed.
+ */
+function safeString(value, defaultValue = '') {
+  if (value == null) return defaultValue;
+  return String(value).trim() || defaultValue;
+}
+
+/**
+ * Escape HTML to prevent XSS. Use when inserting user data into DOM.
+ */
+function escapeHtml(str) {
+  if (str == null) return '';
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
+/**
+ * Wrap event handlers to prevent crashes.
+ */
+function safeHandler(fn) {
+  return function(event) {
+    try {
+      fn.call(this, event);
+    } catch (error) {
+      console.error('[Event Handler Error]', error);
+      updateState({ 
+        status: 'error', 
+        error: 'Something went wrong. Please try again.',
+      });
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// SECTION 4: CORE LOGIC (OFX PARSING)
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Fix Portuguese encoding issues (Windows-1252 corruption in "ASCII" files)
+ * PCD Section 5.2
+ */
+function fixPortugueseEncoding(text) {
+  if (!text) return '';
+  
+  const replacements = {
+    'Ã§': 'ç', 'Ã£': 'ã', 'Ã¡': 'á', 'Ã©': 'é',
+    'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú', 'Ã ': 'à',
+    'Ã¢': 'â', 'Ãª': 'ê', 'Ã´': 'ô', 'Ã£o': 'ão',
+    'Ã‡': 'Ç', 'Ã': 'Ã', 'Ã': 'Á', 'Ã‰': 'É',
+    'Ã': 'Í', 'Ã"': 'Ó', 'Ãš': 'Ú', 'Ã€': 'À',
+    'Ã‚': 'Â', 'ÃŠ': 'Ê', 'Ã"': 'Ô', 'Ã•': 'Õ',
+  };
+  
+  let result = text;
+  for (const [corrupt, correct] of Object.entries(replacements)) {
+    result = result.replaceAll(corrupt, correct);
+  }
+  
+  return result;
+}
+
+/**
+ * Extract single tag value from OFX content
+ * Used by parseOFXFile
+ */
+function extractTag(content, tagName) {
+  if (!content || !tagName) return null;
+  
+  // Pattern: <TAG>value or <TAG>value</TAG>
+  const regex = new RegExp(`<${tagName}>([^<]*(?:</[^>]+>)?)`, 'i');
+  const match = content.match(regex);
+  
+  if (!match) return null;
+  
+  let value = match[1].trim();
+  // Remove closing tag if present
+  value = value.replace(/<\/[^>]+>$/, '').trim();
+  
+  return value || null;
+}
+
+/**
+ * Extract all blocks between start and end tags
+ * Used by parseOFXFile for transactions
+ */
+function extractAllBetween(content, startTag, endTag) {
+  if (!content || !startTag || !endTag) return [];
+  
+  const blocks = [];
+  const regex = new RegExp(`${startTag}([\\s\\S]*?)${endTag}`, 'gi');
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    blocks.push(match[1]);
+  }
+  
+  return blocks;
+}
+
+/**
+ * Convert OFX date formats to DD-MM-YYYY
+ * PCD Section 5.3
+ */
+function parseOFXDate(dateStr) {
+  if (!dateStr) return null;
+  
+  // Remove timezone: YYYYMMDDHHMMSS[-03:EST] → YYYYMMDD
+  const cleanDate = dateStr.split('[')[0].substring(0, 8);
+  
+  if (cleanDate.length !== 8) return null;
+  
+  const year = cleanDate.substring(0, 4);
+  const month = cleanDate.substring(4, 6);
+  const day = cleanDate.substring(6, 8);
+  
+  // Validate
+  const y = parseInt(year, 10);
+  const m = parseInt(month, 10);
+  const d = parseInt(day, 10);
+  
+  if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
+  if (m < 1 || m > 12) return null;
+  if (d < 1 || d > 31) return null;
+  
+  return `${day}-${month}-${year}`;
+}
+
+/**
+ * Extract transaction from STMTTRN block
+ * PCD Section 5.4
+ */
+function parseTransaction(block) {
+  if (!block) return null;
+  
+  const typeRaw = extractTag(block, 'TRNTYPE');
+  const dateRaw = extractTag(block, 'DTPOSTED');
+  const amountRaw = extractTag(block, 'TRNAMT');
+  const memo = extractTag(block, 'MEMO') || extractTag(block, 'NAME') || 'No description';
+  
+  // Validate required fields
+  if (!dateRaw || !amountRaw) {
+    console.warn('[parseTransaction] Skipping: missing date or amount');
+    return null;
+  }
+  
+  const date = parseOFXDate(dateRaw);
+  if (!date) {
+    console.warn('[parseTransaction] Skipping: invalid date', dateRaw);
+    return null;
+  }
+  
+  const amount = parseFloat(amountRaw);
+  if (isNaN(amount)) {
+    console.warn('[parseTransaction] Skipping: invalid amount', amountRaw);
+    return null;
+  }
+  
+  // Map transaction type
+  let type = 'OTHER';
+  if (typeRaw) {
+    const typeUpper = typeRaw.toUpperCase();
+    if (['CREDIT', 'DEBIT', 'PAYMENT', 'OTHER'].includes(typeUpper)) {
+      type = typeUpper;
+    }
+  }
+  
+  return {
+    type,
+    date,
+    amount,
+    description: memo.trim(),
+  };
+}
+
+/**
+ * Format amounts as Brazilian Real (R$ X.XXX,XX)
+ * PCD Section 5.5
+ */
+function formatCurrency(value) {
+  if (value == null || isNaN(value)) {
+    return 'R$ 0,00';
+  }
+  
+  const absValue = Math.abs(value);
+  
+  // Format to 2 decimal places
+  let formatted = absValue.toFixed(2); // "1234.56"
+  
+  // Replace decimal point with comma
+  const parts = formatted.split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1];
+  
+  // Add thousand separators
+  let withSeparators = '';
+  for (let i = integerPart.length - 1, count = 0; i >= 0; i--, count++) {
+    if (count > 0 && count % 3 === 0) {
+      withSeparators = '.' + withSeparators;
+    }
+    withSeparators = integerPart[i] + withSeparators;
+  }
+  
+  return `R$ ${withSeparators},${decimalPart}`;
+}
+
+/**
+ * Main OFX parser - extract all data from file
+ * PCD Section 5.1
+ */
+function parseOFXFile(fileContent) {
+  if (!fileContent || typeof fileContent !== 'string') {
+    throw new Error('Empty file content');
+  }
+  
+  // Fix encoding issues first
+  const content = fixPortugueseEncoding(fileContent);
+  
+  // Validate OFX header
+  if (!content.includes('OFXHEADER') && !content.includes('<OFX>')) {
+    throw new Error('Invalid OFX file');
+  }
+  
+  // Initialize result
+  const result = {
+    metadata: {},
+    transactions: [],
+  };
+  
+  // Extract metadata
+  result.metadata.bankName = extractTag(content, 'ORG') || 'Unknown Bank';
+  result.metadata.bankId = extractTag(content, 'BANKID') || extractTag(content, 'FID');
+  result.metadata.accountId = extractTag(content, 'ACCTID');
+  result.metadata.branchId = extractTag(content, 'BRANCHID');
+  result.metadata.accountType = extractTag(content, 'ACCTTYPE');
+  result.metadata.currency = extractTag(content, 'CURDEF') || 'BRL';
+  
+  // Extract dates
+  const startDateRaw = extractTag(content, 'DTSTART');
+  if (startDateRaw) {
+    result.metadata.startDate = parseOFXDate(startDateRaw);
+  }
+  
+  const endDateRaw = extractTag(content, 'DTEND');
+  if (endDateRaw) {
+    result.metadata.endDate = parseOFXDate(endDateRaw);
+  }
+  
+  // Extract balance
+  const balanceRaw = extractTag(content, 'BALAMT');
+  if (balanceRaw) {
+    result.metadata.balance = parseFloat(balanceRaw);
+  }
+  
+  const balanceDateRaw = extractTag(content, 'DTASOF');
+  if (balanceDateRaw) {
+    result.metadata.balanceDate = parseOFXDate(balanceDateRaw);
+  }
+  
+  // Extract transactions
+  const transactionBlocks = extractAllBetween(content, '<STMTTRN>', '</STMTTRN>');
+  
+  for (const block of transactionBlocks) {
+    const transaction = parseTransaction(block);
+    if (transaction) {
+      result.transactions.push(transaction);
+    }
+  }
+  
+  if (result.transactions.length === 0) {
+    throw new Error('No valid transactions found');
+  }
+  
+  return result;
+}
+
+/**
+ * Process uploaded file
+ * PCD Section 5.6
+ */
+function handleFileUpload(file) {
+  if (!file) {
+    updateState({ status: 'error', error: 'No file selected' });
+    return;
+  }
+  
+  if (!file.name.toLowerCase().endsWith('.ofx')) {
+    updateState({ status: 'error', error: 'Please select an OFX file' });
+    return;
+  }
+  
+  updateState({ status: 'loading', fileName: file.name });
+  
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    try {
+      const content = e.target.result;
+      const ofxData = parseOFXFile(content);
+      updateState({ 
+        status: 'success', 
+        ofxData,
+        error: null,
+      });
+    } catch (error) {
+      console.error('[handleFileUpload] Parse error:', error);
+      updateState({ 
+        status: 'error', 
+        error: error.message || 'Unable to read file. The OFX file may be corrupted.',
+      });
+    }
+  };
+  
+  reader.onerror = function() {
+    updateState({ 
+      status: 'error', 
+      error: 'Failed to read file. Please try again.',
+    });
+  };
+  
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SECTION 5: UI RENDERING FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Master render function - dispatches to state-specific renderers
+ */
+function render() {
+  // Get containers
+  const loadingContainer = document.getElementById('loadingContainer');
+  const errorMessage = document.getElementById('errorMessage');
+  const dataSection = document.getElementById('dataSection');
+  
+  if (!loadingContainer || !errorMessage || !dataSection) {
+    console.error('[render] Required DOM elements not found');
+    return;
+  }
+  
+  // Reset visibility
+  loadingContainer.classList.remove('visible');
+  errorMessage.classList.remove('visible');
+  dataSection.classList.remove('visible');
+  
+  switch (AppState.status) {
+    case 'initial':
+      // Upload section visible, others hidden (default state)
+      break;
+      
+    case 'loading':
+      loadingContainer.classList.add('visible');
+      break;
+      
+    case 'success':
+      dataSection.classList.add('visible');
+      renderMetadata();
+      renderTransactions();
+      break;
+      
+    case 'error':
+      errorMessage.classList.add('visible');
+      const errorText = document.getElementById('errorText');
+      if (errorText) {
+        errorText.textContent = AppState.error || 'An error occurred';
+      }
+      break;
+      
+    default:
+      // Unknown state - show error
+      errorMessage.classList.add('visible');
+      const errorTextDefault = document.getElementById('errorText');
+      if (errorTextDefault) {
+        errorTextDefault.textContent = 'Unknown application state';
+      }
+  }
+}
+
+/**
+ * Render metadata cards
+ */
+function renderMetadata() {
+  const container = document.getElementById('metadataGrid');
+  if (!container || !AppState.ofxData) return;
+  
+  container.innerHTML = '';
+  const metadata = AppState.ofxData.metadata;
+  
+  // Define cards
+  const cards = [
+    {
+      label: 'Banco',
+      value: metadata.bankName || 'N/A',
+      subvalue: metadata.bankId ? `Código: ${metadata.bankId}` : null,
+    },
+    {
+      label: 'Conta',
+      value: metadata.accountId || 'N/A',
+      subvalue: metadata.accountType || null,
+    },
+    {
+      label: 'Agência',
+      value: metadata.branchId || 'N/A',
+      subvalue: null,
+    },
+    {
+      label: 'Período',
+      value: metadata.startDate && metadata.endDate 
+        ? `${metadata.startDate} a ${metadata.endDate}`
+        : 'N/A',
+      subvalue: null,
+    },
+    {
+      label: 'Saldo',
+      value: metadata.balance != null ? formatCurrency(metadata.balance) : 'N/A',
+      subvalue: metadata.balanceDate ? `Em ${metadata.balanceDate}` : null,
+      highlight: metadata.balance != null,
+    },
+    {
+      label: 'Moeda',
+      value: metadata.currency || 'N/A',
+      subvalue: null,
+    },
+  ];
+  
+  // Create cards
+  for (const card of cards) {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'metadata-card';
+    
+    const label = document.createElement('div');
+    label.className = 'card-label';
+    label.textContent = card.label;
+    cardEl.appendChild(label);
+    
+    const value = document.createElement('div');
+    value.className = card.highlight ? 'card-value highlight' : 'card-value';
+    value.textContent = card.value;
+    cardEl.appendChild(value);
+    
+    if (card.subvalue) {
+      const subvalue = document.createElement('div');
+      subvalue.className = 'card-subvalue';
+      subvalue.textContent = card.subvalue;
+      cardEl.appendChild(subvalue);
+    }
+    
+    container.appendChild(cardEl);
+  }
+}
+
+/**
+ * Render transaction table
+ */
+function renderTransactions() {
+  const tbody = document.getElementById('transactionTableBody');
+  const countText = document.getElementById('countText');
+  
+  if (!tbody || !AppState.ofxData) return;
+  
+  tbody.innerHTML = '';
+  const transactions = AppState.ofxData.transactions;
+  
+  // Update count
+  if (countText) {
+    const count = transactions.length;
+    countText.textContent = `${count} transação${count !== 1 ? 'ões' : ''}`;
+  }
+  
+  // Create rows
+  for (const transaction of transactions) {
+    const row = document.createElement('tr');
+    
+    // Date cell
+    const dateCell = document.createElement('td');
+    dateCell.className = 'date-cell';
+    dateCell.textContent = transaction.date;
+    row.appendChild(dateCell);
+    
+    // Amount cell
+    const amountCell = document.createElement('td');
+    const amountClass = transaction.amount >= 0 ? 'credit' : 'debit';
+    amountCell.className = `amount-cell ${amountClass}`;
+    amountCell.textContent = formatCurrency(transaction.amount);
+    row.appendChild(amountCell);
+    
+    // Description cell
+    const descCell = document.createElement('td');
+    descCell.className = 'description-cell';
+    descCell.textContent = transaction.description;
+    row.appendChild(descCell);
+    
+    tbody.appendChild(row);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SECTION 6: EVENT HANDLERS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Set up all event listeners
+ */
+function setupEventListeners() {
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  
+  if (!uploadZone || !fileInput) {
+    throw new Error('Required DOM elements not found');
+  }
+  
+  // Upload zone click
+  uploadZone.addEventListener('click', safeHandler(function() {
+    fileInput.click();
+  }));
+  
+  // File input change
+  fileInput.addEventListener('change', safeHandler(function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  }));
+  
+  // Drag and drop
+  uploadZone.addEventListener('dragover', safeHandler(function(e) {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+  }));
+  
+  uploadZone.addEventListener('dragleave', safeHandler(function(e) {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+  }));
+  
+  uploadZone.addEventListener('drop', safeHandler(function(e) {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  }));
+}
+
+// ═══════════════════════════════════════════════════════════
+// SECTION 7: INITIALIZATION
+// ═══════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    // Initialize in initial state
+    updateState({ status: 'initial' });
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    console.log('[OFX Reader] Application initialized successfully');
+  } catch (error) {
+    console.error('[init] Failed to initialize:', error);
+    document.body.innerHTML = '<div style="color: #f44336; padding: 2rem; text-align: center; font-family: sans-serif;"><h1>Failed to start application</h1><p>Please refresh the page. If the problem persists, check the browser console for details.</p></div>';
+  }
+});
+  </script>
+</body>
+</html>
