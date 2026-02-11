@@ -989,22 +989,94 @@ function safeHandler(fn) {
 /**
  * Fix Portuguese encoding issues (Windows-1252 corruption in "ASCII" files)
  * PCD Section 5.2
+ * 
+ * Handles multiple corruption patterns:
+ * 1. UTF-8 double-encoding (Ã§ → ç, Ã£ → ã, etc.)
+ * 2. Replacement characters (� → proper character based on context)
+ * 3. ISO-8859-1/Windows-1252 bytes read as UTF-8
  */
 function fixPortugueseEncoding(text) {
   if (!text) return '';
   
-  const replacements = {
-    'Ã§': 'ç', 'Ã£': 'ã', 'Ã¡': 'á', 'Ã©': 'é',
-    'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú', 'Ã ': 'à',
-    'Ã¢': 'â', 'Ãª': 'ê', 'Ã´': 'ô', 'Ã£o': 'ão',
-    'Ã‡': 'Ç', 'Ã': 'Ã', 'Ã': 'Á', 'Ã‰': 'É',
-    'Ã': 'Í', 'Ã"': 'Ó', 'Ãš': 'Ú', 'Ã€': 'À',
-    'Ã‚': 'Â', 'ÃŠ': 'Ê', 'Ã"': 'Ô', 'Ã•': 'Õ',
+  // Pattern 1: UTF-8 double-encoding (most common in OFX files)
+  const doubleEncodingMap = {
+    // Lowercase
+    'Ã§': 'ç', 'Ã£': 'ã', 'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 
+    'Ã³': 'ó', 'Ãº': 'ú', 'Ã ': 'à', 'Ã¢': 'â', 'Ãª': 'ê', 
+    'Ã´': 'ô', 'Ãµ': 'õ', 'Ã¨': 'è', 'Ã¬': 'ì', 'Ã²': 'ò',
+    'Ã¹': 'ù', 'Ã¼': 'ü', 'Ã±': 'ñ',
+    // Common combinations
+    'Ã£o': 'ão', 'Ã§Ã£o': 'ção', 'Ã§Ãµes': 'ções',
+    // Uppercase
+    'Ã‡': 'Ç', 'Ãƒ': 'Ã', 'Ã': 'Á', 'Ã‰': 'É', 'Ã': 'Í', 
+    'Ã"': 'Ó', 'Ãš': 'Ú', 'Ã€': 'À', 'Ã‚': 'Â', 'ÃŠ': 'Ê', 
+    'Ã"': 'Ô', 'Ã•': 'Õ',
+  };
+  
+  // Pattern 2: Context-aware replacement character fixes
+  const replacementCharMap = {
+    // Common patterns with replacement character (�)
+    'D�B': 'DÉB',           // Débito
+    'CR�D': 'CRÉD',         // Crédito
+    'SERVI�OS': 'SERVIÇOS', // Serviços
+    'CONV�NIO': 'CONVÊNIO', // Convênio
+    'OP��O': 'OPÇÃO',       // Opção
+    'TRANSA��O': 'TRANSAÇÃO', // Transação
+    'DEP�SITO': 'DEPÓSITO', // Depósito
+    'TRANSFER�NCIA': 'TRANSFERÊNCIA', // Transferência
+    'Sa�de': 'Saúde',       // Saúde
+    'Foz do Igua�u': 'Foz do Iguaçu', // Iguaçu
+    // Single character replacements context
+    '�gua': 'água',
+    '�nico': 'único',
+    '��o': 'ção',
+    '��es': 'ções',
+  };
+  
+  // Pattern 3: Single replacement character → most likely character
+  const singleCharFixes = {
+    'A�': 'AÇ',
+    'O�': 'OÇ',
+    'E�': 'EÇ',
+    'I�': 'IÇ',
+    'U�': 'UÇ',
+    'Ç�': 'ÇÃ',
+    '�A': 'ÇA',
+    '�O': 'ÇO',
+    '�E': 'ÇE',
+    '�I': 'ÇI',
+    '�U': 'ÇU',
   };
   
   let result = text;
-  for (const [corrupt, correct] of Object.entries(replacements)) {
+  
+  // Apply double-encoding fixes first
+  for (const [corrupt, correct] of Object.entries(doubleEncodingMap)) {
     result = result.replaceAll(corrupt, correct);
+  }
+  
+  // Apply context-aware replacement character fixes
+  for (const [corrupt, correct] of Object.entries(replacementCharMap)) {
+    result = result.replaceAll(corrupt, correct);
+  }
+  
+  // Apply single character fixes
+  for (const [corrupt, correct] of Object.entries(singleCharFixes)) {
+    result = result.replaceAll(corrupt, correct);
+  }
+  
+  // Final pass: if still has � (replacement char), try common Portuguese substitutions
+  if (result.includes('�')) {
+    result = result
+      .replace(/�([aeiou])/gi, (match, vowel) => {
+        // � before vowel is likely ç
+        return 'ç' + vowel;
+      })
+      .replace(/([AEIOU])�/g, (match, vowel) => {
+        // Vowel + � is likely vowel with tilde or cedilla
+        const mapping = { 'A': 'Ã', 'E': 'É', 'I': 'Í', 'O': 'Ó', 'U': 'Ú' };
+        return mapping[vowel] || match;
+      });
   }
   
   return result;
@@ -1245,13 +1317,66 @@ function handleFileUpload(file) {
   
   reader.onload = function(e) {
     try {
-      const content = e.target.result;
-      const ofxData = parseOFXFile(content);
-      updateState({ 
-        status: 'success', 
-        ofxData,
-        error: null,
-      });
+      let content = e.target.result;
+      
+      // Detect encoding issues: if we have many � (replacement characters) and file declares CHARSET:1252
+      const hasReplacementChars = content.includes('�');
+      const declaresWindows1252 = /CHARSET:\s*1252/i.test(content);
+      
+      if (hasReplacementChars && declaresWindows1252) {
+        // Try to recover by reading as ISO-8859-1 / Windows-1252
+        // FileReader doesn't support Windows-1252 directly, so we'll use binary read
+        const binaryReader = new FileReader();
+        binaryReader.onload = function(binaryEvent) {
+          try {
+            // Read as array buffer, then decode as Latin1
+            const bytes = new Uint8Array(binaryEvent.target.result);
+            let latin1Content = '';
+            for (let i = 0; i < bytes.length; i++) {
+              latin1Content += String.fromCharCode(bytes[i]);
+            }
+            
+            // Now apply encoding fixes
+            const ofxData = parseOFXFile(latin1Content);
+            updateState({ 
+              status: 'success', 
+              ofxData,
+              error: null,
+            });
+          } catch (error) {
+            console.error('[handleFileUpload] Binary read parse error:', error);
+            // Fall back to UTF-8 parsing with enhanced fixes
+            try {
+              const ofxData = parseOFXFile(content);
+              updateState({ 
+                status: 'success', 
+                ofxData,
+                error: null,
+              });
+            } catch (fallbackError) {
+              updateState({ 
+                status: 'error', 
+                error: fallbackError.message || 'Unable to read file. The OFX file may be corrupted.',
+              });
+            }
+          }
+        };
+        binaryReader.onerror = function() {
+          updateState({ 
+            status: 'error', 
+            error: 'Failed to read file. Please try again.',
+          });
+        };
+        binaryReader.readAsArrayBuffer(file);
+      } else {
+        // Standard UTF-8 parsing
+        const ofxData = parseOFXFile(content);
+        updateState({ 
+          status: 'success', 
+          ofxData,
+          error: null,
+        });
+      }
     } catch (error) {
       console.error('[handleFileUpload] Parse error:', error);
       updateState({ 
