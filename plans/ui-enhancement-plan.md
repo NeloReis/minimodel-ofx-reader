@@ -4,16 +4,19 @@
 
 Enhance the existing single-file OFX Reader webapp with lightweight external libraries while maintaining the single HTML file architecture. The goal is to add sophisticated analytics, smoother animations, and professional icons without converting to a framework-based application.
 
+> **⚠️ Offline Requirement**: All libraries will be inlined directly into the HTML file for true offline functionality.
+
 ---
 
-## Libraries to Integrate
+## Libraries to Integrate (INLINED)
 
-| Library | Version | Purpose | CDN URL |
-|---------|---------|---------|---------|
-| **Chart.js** | 4.4.x | Financial analytics charts | `https://cdn.jsdelivr.net/npm/chart.js` |
-| **GSAP** | 3.12.x | Advanced animations | `https://cdn.jsdelivr.net/npm/gsap@3` |
-| **Phosphor Icons** | Latest | Professional icon set | `https://unpkg.com/@phosphor-icons/web` |
-| **Motion One** | 8.x | Lightweight animation alternative | `https://cdn.jsdelivr.net/npm/motion@latest` |
+| Library | Version | Purpose | Size (minified) |
+|---------|---------|---------|-----------------|
+| **Chart.js** | 4.4.x | Financial analytics charts | ~200KB |
+| **GSAP** | 3.12.x | Advanced animations | ~60KB |
+| **Phosphor Icons** | Latest | Professional icon set | ~15KB (CSS only) |
+
+**Implementation**: Libraries downloaded and inlined as `<script>` and `<style>` blocks in the HTML file.
 
 ---
 
@@ -134,8 +137,10 @@ Replace all emoji icons with Phosphor icons:
 ## Implementation Phases
 
 ### Phase 1: Foundation
-- [ ] Add library CDN links to `<head>`
-- [ ] Add Phosphor Icons stylesheet
+- [ ] Download Chart.js minified bundle (~200KB)
+- [ ] Download GSAP minified bundle (~60KB)
+- [ ] Download Phosphor Icons CSS (~15KB)
+- [ ] Inline all libraries directly into index.html
 - [ ] Set up CSS variables for chart colors
 
 ### Phase 2: Analytics Dashboard
