@@ -131,6 +131,131 @@
   --sidebar-width: 380px;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   ANIMATIONS & MICRO-INTERACTIONS
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Page Load Animations ── */
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes headerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Staggered Animation Delays ── */
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Pulse Animation ── */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+/* ── Subtle Float Animation ── */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ── Ripple Effect ── */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ── Glow Pulse ── */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(25, 118, 210, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(25, 118, 210, 0.5), 0 0 30px rgba(25, 118, 210, 0.3);
+  }
+}
+
+/* ── Status Indicator Pulse ── */
+@keyframes statusPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ── Card Hover Glow ── */
+@keyframes cardShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
 /* ────────────────── BASE STYLES ────────────────── */
 
 html {
@@ -163,6 +288,25 @@ body::before {
     radial-gradient(ellipse at 90% 90%, rgba(66, 165, 245, 0.08) 0%, transparent 40%);
   pointer-events: none;
   z-index: -1;
+  animation: bgShift 10s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+  0% {
+    background-image: 
+      radial-gradient(ellipse at 10% 10%, rgba(25, 118, 210, 0.12) 0%, transparent 40%),
+      radial-gradient(ellipse at 90% 90%, rgba(66, 165, 245, 0.08) 0%, transparent 40%);
+  }
+  50% {
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, rgba(25, 118, 210, 0.15) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 80%, rgba(66, 165, 245, 0.1) 0%, transparent 45%);
+  }
+  100% {
+    background-image: 
+      radial-gradient(ellipse at 10% 10%, rgba(25, 118, 210, 0.12) 0%, transparent 40%),
+      radial-gradient(ellipse at 90% 90%, rgba(66, 165, 245, 0.08) 0%, transparent 40%);
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -223,6 +367,7 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
   position: relative;
   z-index: 100;
+  animation: headerSlideDown 0.5s ease-out;
 }
 
 .header-left {
@@ -247,6 +392,13 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   font-size: 1.25rem;
   box-shadow: var(--shadow-md), 0 0 20px rgba(25, 118, 210, 0.3);
+  transition: all var(--transition-bounce);
+  animation: float 4s ease-in-out infinite;
+}
+
+.app-logo-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(25, 118, 210, 0.5);
 }
 
 .app-title {
@@ -275,6 +427,26 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  transition: all var(--transition-base);
+}
+
+.header-status.success {
+  background: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.4);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.header-status.error {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+
+.header-status.processing {
+  animation: statusPulse 1s ease-in-out infinite;
+}
+
+.header-status .status-icon {
+  transition: transform var(--transition-bounce);
 }
 
 /* ────────────────── MAIN CONTENT ────────────────── */
@@ -285,6 +457,7 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   padding: var(--space-6);
   gap: var(--space-6);
+  animation: slideUpFadeIn 0.6s ease-out 0.2s both;
 }
 
 /* ────────────────── TOP SECTION ────────────────── */
@@ -365,6 +538,7 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--accent);
   background: rgba(25, 118, 210, 0.05);
   box-shadow: var(--shadow-lg), var(--glow-accent);
+  transform: translateY(-2px);
 }
 
 .upload-zone:hover::before,
@@ -389,6 +563,12 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(145deg, rgba(76, 175, 80, 0.1) 0%, transparent 50%);
 }
 
+.upload-zone.has-file:hover {
+  border-color: #66bb6a;
+  box-shadow: 0 8px 30px rgba(76, 175, 80, 0.2), 0 0 15px rgba(76, 175, 80, 0.15);
+  transform: translateY(-2px);
+}
+
 .upload-icon {
   font-size: 3rem;
   color: var(--accent);
@@ -397,10 +577,21 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   z-index: 1;
   transition: transform var(--transition-bounce);
+  animation: float 3s ease-in-out infinite;
 }
 
 .upload-zone:hover .upload-icon {
+  animation: none;
   transform: scale(1.15);
+}
+
+.upload-zone.dragover .upload-icon {
+  animation: pulse 0.6s ease-in-out infinite;
+  transform: scale(1.2);
+}
+
+.upload-zone.has-file .upload-icon {
+  animation: statusPulse 1s ease-in-out infinite;
 }
 
 .upload-title {
@@ -447,7 +638,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .loading-container.visible {
   display: flex;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.3s ease-out, scaleIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
@@ -462,6 +653,21 @@ h1, h2, h3, h4, h5, h6 {
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 10px rgba(25, 118, 210, 0.3);
+}
+
+.spinner::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: rgba(25, 118, 210, 0.3);
+  animation: spin 1.2s linear infinite reverse;
 }
 
 @keyframes spin {
@@ -554,7 +760,16 @@ h1, h2, h3, h4, h5, h6 {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  opacity: 0;
+  animation: staggerFadeIn 0.5s ease-out forwards;
 }
+
+.info-card:nth-child(1) { animation-delay: 0.1s; }
+.info-card:nth-child(2) { animation-delay: 0.2s; }
+.info-card:nth-child(3) { animation-delay: 0.3s; }
+.info-card:nth-child(4) { animation-delay: 0.4s; }
+.info-card:nth-child(5) { animation-delay: 0.5s; }
+.info-card:nth-child(6) { animation-delay: 0.6s; }
 
 .info-card::before {
   content: '';
@@ -569,14 +784,35 @@ h1, h2, h3, h4, h5, h6 {
   transition: transform var(--transition-base);
 }
 
+.info-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  transform: rotate(45deg) translateX(-100%);
+  transition: transform 0.6s ease-out;
+}
+
 .info-card:hover {
   border-color: var(--border-default);
   box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .info-card:hover::before {
   transform: scaleX(1);
+}
+
+.info-card:hover::after {
+  transform: rotate(45deg) translateX(100%);
 }
 
 .info-card.highlight {
@@ -595,6 +831,12 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: var(--space-2);
   background: rgba(25, 118, 210, 0.15);
   color: var(--accent-light);
+  transition: all var(--transition-base);
+}
+
+.info-card:hover .card-icon {
+  transform: scale(1.1) rotate(5deg);
+  background: rgba(25, 118, 210, 0.25);
 }
 
 .card-label {
@@ -646,6 +888,8 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border-subtle);
   overflow: hidden;
+  opacity: 0;
+  animation: slideUpFadeIn 0.6s ease-out 0.3s forwards;
 }
 
 .list-header {
@@ -678,6 +922,11 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--accent-light);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
+  transition: all var(--transition-base);
+}
+
+.list-count.animate {
+  animation: scaleIn 0.3s ease-out;
 }
 
 .list-container {
@@ -715,10 +964,17 @@ h1, h2, h3, h4, h5, h6 {
   padding: var(--space-3) var(--space-5);
   border-bottom: 1px solid var(--border-subtle);
   transition: all var(--transition-fast);
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.transaction-item.animate-in {
+  animation: slideInFromLeft 0.4s ease-out forwards;
 }
 
 .transaction-item:hover {
   background: var(--bg-hover);
+  padding-left: calc(var(--space-5) + 5px);
 }
 
 .transaction-item:last-child {
@@ -749,6 +1005,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-sm);
   padding-right: var(--space-4);
+  transition: all var(--transition-fast);
 }
 
 .transaction-amount.credit {
@@ -757,6 +1014,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .transaction-amount.debit {
   color: var(--color-error);
+}
+
+.transaction-item:hover .transaction-amount {
+  transform: scale(1.05);
+  font-weight: var(--font-weight-bold);
 }
 
 .transaction-description {
@@ -793,6 +1055,15 @@ h1, h2, h3, h4, h5, h6 {
   
   .bottom-section {
     min-height: 400px;
+  }
+  
+  .info-card {
+    animation-duration: 0.4s;
+  }
+  
+  .bottom-section {
+    animation-duration: 0.5s;
+    animation-delay: 0.2s;
   }
 }
 
@@ -1568,14 +1839,16 @@ function render() {
   switch (AppState.status) {
     case 'initial':
       if (headerStatus) {
-        headerStatus.innerHTML = '<span>📄</span><span>Aguardando arquivo</span>';
+        headerStatus.className = 'header-status';
+        headerStatus.innerHTML = '<span class="status-icon">📄</span><span>Aguardando arquivo</span>';
       }
       break;
       
     case 'loading':
       loadingContainer.classList.add('visible');
       if (headerStatus) {
-        headerStatus.innerHTML = '<span>⏳</span><span>Processando...</span>';
+        headerStatus.className = 'header-status processing';
+        headerStatus.innerHTML = '<span class="status-icon">⏳</span><span>Processando...</span>';
       }
       break;
       
@@ -1583,7 +1856,8 @@ function render() {
       if (infoSection) infoSection.style.display = 'flex';
       if (bottomSection) bottomSection.style.display = 'flex';
       if (headerStatus) {
-        headerStatus.innerHTML = '<span>✅</span><span>Arquivo carregado</span>';
+        headerStatus.className = 'header-status success';
+        headerStatus.innerHTML = '<span class="status-icon">✅</span><span>Arquivo carregado</span>';
       }
       renderInfoCards();
       renderTransactions();
@@ -1596,7 +1870,8 @@ function render() {
         errorText.textContent = AppState.error || 'An error occurred';
       }
       if (headerStatus) {
-        headerStatus.innerHTML = '<span>❌</span><span>Erro</span>';
+        headerStatus.className = 'header-status error';
+        headerStatus.innerHTML = '<span class="status-icon">❌</span><span>Erro</span>';
       }
       break;
       
@@ -1644,12 +1919,13 @@ function renderInfoCards() {
     { icon: '💵', label: 'Moeda', value: metadata.currency || 'BRL', subvalue: null },
   ];
   
-  // Create cards
-  for (const card of cards) {
+  // Create cards with staggered animation delays
+  cards.forEach((card, index) => {
     const cardEl = document.createElement('div');
     let cardClass = 'info-card';
     if (card.highlight) cardClass += ' highlight';
     cardEl.className = cardClass;
+    cardEl.style.animationDelay = `${0.1 + index * 0.1}s`;
     
     const icon = document.createElement('div');
     icon.className = 'card-icon';
@@ -1679,7 +1955,7 @@ function renderInfoCards() {
     }
     
     container.appendChild(cardEl);
-  }
+  });
 }
 
 /**
@@ -1699,16 +1975,25 @@ function renderTransactions() {
   list.innerHTML = '';
   const transactions = AppState.ofxData.transactions;
   
-  // Update count
+  // Update count with animation
   if (countElement) {
     const count = transactions.length;
     countElement.innerHTML = `<span>${count}</span> transação${count !== 1 ? 'ões' : ''}`;
+    // Trigger animation
+    countElement.classList.remove('animate');
+    void countElement.offsetWidth; // Force reflow
+    countElement.classList.add('animate');
   }
   
-  // Create list items
+  // Create list items with staggered animation
   transactions.forEach((transaction, index) => {
     const item = document.createElement('li');
     item.className = 'transaction-item';
+    // Stagger animation: max 15 items get delayed animation
+    if (index < 15) {
+      item.style.animationDelay = `${0.05 + index * 0.03}s`;
+      item.classList.add('animate-in');
+    }
     
     const dateEl = document.createElement('span');
     dateEl.className = 'transaction-date';
