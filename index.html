@@ -2338,6 +2338,8 @@ function render() {
   const loadingContainer = document.getElementById('loadingContainer');
   const errorMessage = document.getElementById('errorMessage');
   const infoSection = document.getElementById('infoSection');
+  const analyticsSection = document.getElementById('analyticsSection');
+  const filterBar = document.getElementById('filterBar');
   const bottomSection = document.getElementById('bottomSection');
   const headerStatus = document.getElementById('headerStatus');
   const uploadZone = document.getElementById('uploadZone');
@@ -2353,6 +2355,8 @@ function render() {
   
   // Hide data sections by default
   if (infoSection) infoSection.style.display = 'none';
+  if (analyticsSection) analyticsSection.classList.remove('visible');
+  if (filterBar) filterBar.classList.remove('visible');
   if (bottomSection) bottomSection.style.display = 'none';
   
   // Reset upload zone if not in success state
@@ -2378,12 +2382,15 @@ function render() {
       
     case 'success':
       if (infoSection) infoSection.style.display = 'flex';
+      if (analyticsSection) analyticsSection.classList.add('visible');
+      if (filterBar) filterBar.classList.add('visible');
       if (bottomSection) bottomSection.style.display = 'flex';
       if (headerStatus) {
         headerStatus.className = 'header-status success';
         headerStatus.innerHTML = '<span class="status-icon">✅</span><span>Arquivo carregado</span>';
       }
       renderInfoCards();
+      renderAnalytics();
       renderTransactions();
       break;
       
@@ -2479,6 +2486,411 @@ function renderInfoCards() {
     }
     
     container.appendChild(cardEl);
+  });
+}
+
+// Chart instances storage
+let chartInstances = {};
+
+/**
+ * Render analytics dashboard with Chart.js
+ */
+function renderAnalytics() {
+  if (!AppState.ofxData || !AppState.ofxData.transactions) return;
+  
+  const transactions = AppState.ofxData.transactions;
+  
+  // Calculate statistics
+  const stats = calculateTransactionStats(transactions);
+  renderStatsCards(stats);
+  
+  // Render charts
+  renderCashFlowChart(transactions);
+  renderCategoryChart(transactions);
+  renderBalanceChart(transactions);
+  renderDailySummaryChart(transactions);
+  
+  // Animate charts with GSAP if available
+  if (typeof gsap !== 'undefined') {
+    gsap.from('.chart-card', {
+      scrollTrigger: '.analytics-section',
+      y: 30,
+      opacity: 0,
+      stagger: 0.1,
+      duration: 0.5,
+      ease: 'power2.out'
+    });
+    
+    gsap.from('.stat-card', {
+      y: 20,
+      opacity: 0,
+      stagger: 0.08,
+      duration: 0.4,
+      ease: 'back.out(1.5)'
+    });
+  }
+}
+
+/**
+ * Calculate transaction statistics
+ */
+function calculateTransactionStats(transactions) {
+  let totalCredits = 0;
+  let totalDebits = 0;
+  
+  transactions.forEach(t => {
+    if (t.amount > 0) {
+      totalCredits += t.amount;
+    } else {
+      totalDebits += Math.abs(t.amount);
+    }
+  });
+  
+  const netBalance = totalCredits - totalDebits;
+  const avgTransaction = transactions.length > 0
+    ? (totalCredits + totalDebits) / transactions.length
+    : 0;
+  
+  return {
+    totalCredits,
+    totalDebits,
+    netBalance,
+    avgTransaction
+  };
+}
+
+/**
+ * Render statistics cards
+ */
+function renderStatsCards(stats) {
+  const creditsEl = document.getElementById('statCredits');
+  const debitsEl = document.getElementById('statDebits');
+  const netEl = document.getElementById('statNet');
+  const avgEl = document.getElementById('statAverage');
+  
+  if (creditsEl) creditsEl.textContent = formatCurrency(stats.totalCredits);
+  if (debitsEl) debitsEl.textContent = formatCurrency(stats.totalDebits);
+  if (netEl) {
+    netEl.textContent = formatCurrency(stats.netBalance);
+    netEl.className = 'stat-value ' + (stats.netBalance >= 0 ? 'credit' : 'debit');
+  }
+  if (avgEl) avgEl.textContent = formatCurrency(stats.avgTransaction);
+}
+
+/**
+ * Get month label from date string
+ */
+function getMonthLabel(dateStr) {
+  const date = new Date(dateStr);
+  const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return months[date.getMonth()];
+}
+
+/**
+ * Render cash flow bar chart
+ */
+function renderCashFlowChart(transactions) {
+  const ctx = document.getElementById('cashFlowChart');
+  if (!ctx) return;
+  
+  // Destroy existing chart
+  if (chartInstances.cashFlow) {
+    chartInstances.cashFlow.destroy();
+  }
+  
+  // Group by month
+  const monthlyData = {};
+  transactions.forEach(t => {
+    const month = getMonthLabel(t.dateRaw);
+    if (!monthlyData[month]) {
+      monthlyData[month] = { credit: 0, debit: 0 };
+    }
+    if (t.amount > 0) {
+      monthlyData[month].credit += t.amount;
+    } else {
+      monthlyData[month].debit += Math.abs(t.amount);
+    }
+  });
+  
+  const labels = Object.keys(monthlyData);
+  const creditData = labels.map(l => monthlyData[l].credit);
+  const debitData = labels.map(l => monthlyData[l].debit);
+  
+  chartInstances.cashFlow = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Créditos',
+          data: creditData,
+          backgroundColor: 'rgba(76, 175, 80, 0.8)',
+          borderColor: '#4caf50',
+          borderWidth: 1,
+          borderRadius: 4
+        },
+        {
+          label: 'Débitos',
+          data: debitData,
+          backgroundColor: 'rgba(244, 67, 54, 0.8)',
+          borderColor: '#f44336',
+          borderWidth: 1,
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { color: '#90caf9', font: { size: 11 } }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#90caf9' },
+          grid: { color: 'rgba(144, 202, 249, 0.1)' }
+        },
+        y: {
+          ticks: {
+            color: '#90caf9',
+            callback: function(value) {
+              return 'R$ ' + value.toLocaleString('pt-BR');
+            }
+          },
+          grid: { color: 'rgba(144, 202, 249, 0.1)' }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Render category doughnut chart
+ */
+function renderCategoryChart(transactions) {
+  const ctx = document.getElementById('categoryChart');
+  if (!ctx) return;
+  
+  if (chartInstances.category) {
+    chartInstances.category.destroy();
+  }
+  
+  // Categorize transactions based on memo keywords
+  const categories = {
+    'Transferência': 0,
+    'Pagamento': 0,
+    'Compra': 0,
+    'Tarifa': 0,
+    'Outros': 0
+  };
+  
+  const keywords = {
+    'Transferência': ['transfer', 'tranfer', 'pix', 'ted', 'doc', 'envio', 'receb'],
+    'Pagamento': ['pagamento', 'boleto', 'conta luz', 'conta água', 'internet', 'telefone'],
+    'Compra': ['compra', 'loja', 'mercado', 'supermercado', 'farmácia', 'uber', 'ifood'],
+    'Tarifa': ['tarifa', 'taxa', 'juros', 'mutuo', 'iof']
+  };
+  
+  transactions.forEach(t => {
+    const memo = (t.memo || '').toLowerCase();
+    let categorized = false;
+    
+    for (const [cat, words] of Object.entries(keywords)) {
+      if (words.some(w => memo.includes(w))) {
+        categories[cat] += Math.abs(t.amount);
+        categorized = true;
+        break;
+      }
+    }
+    
+    if (!categorized) {
+      categories['Outros'] += Math.abs(t.amount);
+    }
+  });
+  
+  const colors = [
+    'rgba(25, 118, 210, 0.8)',
+    'rgba(168, 85, 247, 0.8)',
+    'rgba(251, 191, 36, 0.8)',
+    'rgba(244, 67, 54, 0.8)',
+    'rgba(100, 181, 246, 0.8)'
+  ];
+  
+  chartInstances.category = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(categories),
+      datasets: [{
+        data: Object.values(categories),
+        backgroundColor: colors,
+        borderColor: '#081625',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: '#90caf9', font: { size: 10 }, boxWidth: 12 }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Render balance evolution line chart
+ */
+function renderBalanceChart(transactions) {
+  const ctx = document.getElementById('balanceChart');
+  if (!ctx) return;
+  
+  if (chartInstances.balance) {
+    chartInstances.balance.destroy();
+  }
+  
+  // Sort by date
+  const sorted = [...transactions].sort((a, b) =>
+    new Date(a.dateRaw) - new Date(b.dateRaw)
+  );
+  
+  // Calculate running balance
+  let balance = 0;
+  const balanceData = sorted.map(t => {
+    balance += t.amount;
+    return { date: t.date, balance: balance };
+  });
+  
+  // Take last 30 data points if too many
+  const displayData = balanceData.length > 30
+    ? balanceData.slice(-30)
+    : balanceData;
+  
+  chartInstances.balance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: displayData.map(d => d.date),
+      datasets: [{
+        label: 'Saldo Acumulado',
+        data: displayData.map(d => d.balance),
+        borderColor: '#00e5ff',
+        backgroundColor: 'rgba(0, 229, 255, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#00e5ff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#90caf9',
+            maxRotation: 45,
+            minRotation: 45,
+            font: { size: 9 }
+          },
+          grid: { color: 'rgba(144, 202, 249, 0.1)' }
+        },
+        y: {
+          ticks: {
+            color: '#90caf9',
+            callback: function(value) {
+              return 'R$ ' + value.toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+            }
+          },
+          grid: { color: 'rgba(144, 202, 249, 0.1)' }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Render daily summary bar chart
+ */
+function renderDailySummaryChart(transactions) {
+  const ctx = document.getElementById('dailySummaryChart');
+  if (!ctx) return;
+  
+  if (chartInstances.dailySummary) {
+    chartInstances.dailySummary.destroy();
+  }
+  
+  // Group by day
+  const dailyData = {};
+  transactions.forEach(t => {
+    const day = t.date;
+    if (!dailyData[day]) {
+      dailyData[day] = { credit: 0, debit: 0 };
+    }
+    if (t.amount > 0) {
+      dailyData[day].credit += t.amount;
+    } else {
+      dailyData[day].debit += Math.abs(t.amount);
+    }
+  });
+  
+  const labels = Object.keys(dailyData).slice(-10); // Last 10 days
+  const creditData = labels.map(l => dailyData[l].credit);
+  const debitData = labels.map(l => dailyData[l].debit);
+  
+  chartInstances.dailySummary = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Créditos',
+          data: creditData,
+          backgroundColor: 'rgba(76, 175, 80, 0.7)',
+          borderRadius: 3
+        },
+        {
+          label: 'Débitos',
+          data: debitData,
+          backgroundColor: 'rgba(244, 67, 54, 0.7)',
+          borderRadius: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { color: '#90caf9', font: { size: 10 } }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#90caf9', font: { size: 9 } },
+          grid: { display: false }
+        },
+        y: {
+          ticks: {
+            color: '#90caf9',
+            callback: function(value) {
+              return 'R$ ' + value.toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+            }
+          },
+          grid: { color: 'rgba(144, 202, 249, 0.1)' }
+        }
+      }
+    }
   });
 }
 
@@ -2589,6 +3001,107 @@ function setupUploadZoneEvents() {
  */
 function setupEventListeners() {
   setupUploadZoneEvents();
+  
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      filterTransactions(e.target.value, document.getElementById('sortSelect')?.value || 'date-desc');
+    });
+  }
+  
+  // Sort functionality
+  const sortSelect = document.getElementById('sortSelect');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function(e) {
+      const searchValue = document.getElementById('searchInput')?.value || '';
+      filterTransactions(searchValue, e.target.value);
+    });
+  }
+}
+
+/**
+ * Filter and sort transactions
+ */
+function filterTransactions(searchTerm, sortOrder) {
+  if (!AppState.ofxData || !AppState.ofxData.transactions) return;
+  
+  const list = document.getElementById('transactionList');
+  const resultCount = document.getElementById('resultCount');
+  
+  let transactions = [...AppState.ofxData.transactions];
+  
+  // Filter by search term
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    transactions = transactions.filter(t =>
+      (t.memo && t.memo.toLowerCase().includes(term)) ||
+      (t.date && t.date.includes(term)) ||
+      (t.type && t.type.toLowerCase().includes(term))
+    );
+  }
+  
+  // Sort transactions
+  transactions.sort((a, b) => {
+    switch (sortOrder) {
+      case 'date-asc':
+        return new Date(a.dateRaw) - new Date(b.dateRaw);
+      case 'date-desc':
+        return new Date(b.dateRaw) - new Date(a.dateRaw);
+      case 'amount-asc':
+        return a.amount - b.amount;
+      case 'amount-desc':
+        return b.amount - a.amount;
+      default:
+        return 0;
+    }
+  });
+  
+  // Update result count
+  if (resultCount) {
+    const total = AppState.ofxData.transactions.length;
+    resultCount.textContent = transactions.length === total
+      ? `${total} transações`
+      : `${transactions.length} de ${total} transações`;
+  }
+  
+  // Re-render filtered transactions
+  renderFilteredTransactions(transactions);
+}
+
+/**
+ * Render filtered transactions
+ */
+function renderFilteredTransactions(transactions) {
+  const list = document.getElementById('transactionList');
+  if (!list) return;
+  
+  list.innerHTML = '';
+  
+  transactions.forEach((transaction, index) => {
+    const item = document.createElement('li');
+    item.className = 'transaction-item';
+    item.style.animationDelay = `${index * 0.02}s`;
+    item.classList.add('animate-in');
+    
+    const dateEl = document.createElement('span');
+    dateEl.className = 'transaction-date';
+    dateEl.textContent = transaction.date;
+    item.appendChild(dateEl);
+    
+    const amountEl = document.createElement('span');
+    const amountClass = transaction.amount >= 0 ? 'credit' : 'debit';
+    amountEl.className = `transaction-amount ${amountClass}`;
+    amountEl.textContent = formatCurrency(transaction.amount);
+    item.appendChild(amountEl);
+    
+    const descEl = document.createElement('span');
+    descEl.className = 'transaction-description';
+    descEl.textContent = transaction.memo || 'Sem descrição';
+    item.appendChild(descEl);
+    
+    list.appendChild(item);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2602,6 +3115,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up event listeners
     setupEventListeners();
+    
+    // GSAP Page Load Animation
+    if (typeof gsap !== 'undefined') {
+      const timeline = gsap.timeline();
+      
+      // Header slide down
+      timeline.from('.app-header', {
+        y: -80,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power3.out'
+      });
+      
+      // Upload zone scale in
+      timeline.from('.upload-zone', {
+        scale: 0.9,
+        opacity: 0,
+        duration: 0.4,
+        ease: 'back.out(1.5)'
+      }, '-=0.2');
+      
+      // Info section fade in
+      timeline.from('.info-section', {
+        y: 20,
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+      }, '-=0.1');
+    }
     
     console.log('[OFX Reader] Application initialized successfully');
   } catch (error) {
