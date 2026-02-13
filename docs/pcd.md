@@ -637,7 +637,7 @@ Each criterion is testable with a YES/NO procedure:
 | # | Criterion | Test Procedure |
 |---|-----------|----------------|
 | 1 | Single HTML file works offline | Open file in browser with network disabled. Can load and use app? YES/NO |
-| 2 | Loads ITAU sample correctly | Drop "EXTRATO - 10 - ITAU - OFX.ofx". See 75 transactions? YES/NO |
+| 2 | Loads ITAU sample correctly | Drop "EXTRATO - 10 - ITAU - OFX.ofx". See 45 transactions? YES/NO |
 | 3 | Loads Nubank sample correctly | Drop "NU_93139634_01JAN2026_28JAN2026.ofx". See 7 transactions? YES/NO |
 | 4 | Loads Banco Inter sample correctly | Drop "Extrato-29-12-2025-a-29-01-2026-OFX.ofx". See all transactions? YES/NO |
 | 5 | Loads SICOOB sample 1 correctly | Drop "extrato-conta-corrente-ofx-unix_202601_20260109153954.ofx". See all transactions? YES/NO |
@@ -684,7 +684,7 @@ Each criterion is testable with a YES/NO procedure:
 - Date Range: 01/10/2025 to 31/10/2025
 - Balance: R$ 25.282,87 (as of 08/01/2026)
 
-**Transactions:** 75 total
+**Transactions:** 45 total
 - Transaction Fields: `<TRNTYPE>`, `<DTPOSTED>`, `<TRNAMT>`, `<FITID>`, `<CHECKNUM>`, `<MEMO>`
 - Date Format: YYYYMMDDHHMMSS[-03:EST]
 - Types: CREDIT, DEBIT
