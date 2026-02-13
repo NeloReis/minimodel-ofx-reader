@@ -855,10 +855,106 @@ ADRs are stored in `.github/adrs/` directory:
 
 ---
 
+## 11. UI Enhancement Addendum (v2.0)
+
+### 11.1 Overview
+
+The following UI enhancements create a polished, professional full-page responsive web application dashboard. These changes supersede Section 6 (UI Specification).
+
+### 11.2 New Layout Structure
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ HEADER (fixed 72px)                                             │
+│ [Logo + Title]                              [Status Indicator]   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  TOP SECTION (45% height, flex)                                 │
+│  ┌─────────────────────┬─────────────────────────────────────┐ │
+│  │                     │                                      │ │
+│  │   DROP ZONE         │     INFO CARDS (2x3 grid)           │ │
+│  │   (left column)    │     (right column)                   │ │
+│  │   ~380px           │                                      │ │
+│  │                     │                                      │ │
+│  └─────────────────────┴─────────────────────────────────────┘ │
+│                                                                 │
+│  BOTTOM SECTION (55% height, flex)                              │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │  HEADER: [Title + Transaction Count Badge]                 ││
+│  ├─────────────────────────────────────────────────────────────┤│
+│  │                                                            ││
+│  │  SCROLLABLE TRANSACTION LIST                               ││
+│  │  (internal scrolling - NO page scroll)                    ││
+│  │                                                            ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 11.3 New Visual Design
+
+**Enhanced Color Palette:**
+- Background: Gradient from `#0a1929` to `#0d1f35`
+- Cards: `#132f4c` with subtle shine effect
+- Accent glow: Medium intensity blue glow
+- Status colors: Green (success), Red (error), Blue (info)
+
+**Typography Enhancements:**
+- Monospace font for amounts and dates
+- System font stack for better performance
+- Gradient text for titles
+
+**Interactive Elements:**
+- Hover effects on cards with lift animation
+- Pulse animation on logo
+- Smooth transitions (250ms)
+- Staggered animations for list items
+
+### 11.4 Component Enhancements
+
+**Header:**
+- Fixed position, always visible
+- Logo with gradient icon
+- Status badge showing current state
+
+**Drop Zone:**
+- Animated background on hover
+- Visual feedback for drag states
+- Shows file loaded state with checkmark
+
+**Info Cards:**
+- 2x3 grid layout
+- Icons for each card type
+- Hover lift effect with accent border
+- Color-coded balance (green positive, red negative)
+
+**Transaction List:**
+- Scrollable container (no page scroll)
+- Alternating row colors
+- Hover highlight
+- Truncation with ellipsis
+
+### 11.5 Responsive Breakpoints
+
+- **Desktop** (>1024px): Full 2-column layout
+- **Tablet** (768-1024px): Stacked layout
+- **Mobile** (<768px): Single column, full width
+
+### 11.6 Application States (Enhanced)
+
+| State | Header Status | Drop Zone | Info Cards | Transaction List |
+|-------|--------------|-----------|------------|-----------------|
+| Initial | 📄 Aguardando arquivo | Visible, prominent | Hidden | Hidden |
+| Loading | ⏳ Processando... | Disabled | Hidden | Hidden |
+| Success | ✅ Arquivo carregado | Shows filename | Visible | Visible (scrollable) |
+| Error | ❌ Erro | Visible | Hidden | Hidden |
+
+---
+
 ## Document Metadata
 
-- **Version:** 1.0
-- **Created:** 2026-02-10
+- **Version:** 2.0
+- **Created:** 2026-02-13
 - **Author:** Architect Agent
-- **Status:** Complete - Ready for Designer handoff
-- **Next Agent:** Designer (for Type A project, Designer creates design-spec.md if needed)
+- **Status:** Complete - Ready for Implementer
+- **Changes:** Full UI redesign to dashboard layout
