@@ -2496,38 +2496,45 @@ let chartInstances = {};
  * Render analytics dashboard with Chart.js
  */
 function renderAnalytics() {
-  if (!AppState.ofxData || !AppState.ofxData.transactions) return;
-  
-  const transactions = AppState.ofxData.transactions;
-  
-  // Calculate statistics
-  const stats = calculateTransactionStats(transactions);
-  renderStatsCards(stats);
-  
-  // Render charts
-  renderCashFlowChart(transactions);
-  renderCategoryChart(transactions);
-  renderBalanceChart(transactions);
-  renderDailySummaryChart(transactions);
-  
-  // Animate charts with GSAP if available
-  if (typeof gsap !== 'undefined') {
-    gsap.from('.chart-card', {
-      scrollTrigger: '.analytics-section',
-      y: 30,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.5,
-      ease: 'power2.out'
-    });
+  try {
+    if (!AppState.ofxData || !AppState.ofxData.transactions) return;
     
-    gsap.from('.stat-card', {
-      y: 20,
-      opacity: 0,
-      stagger: 0.08,
-      duration: 0.4,
-      ease: 'back.out(1.5)'
-    });
+    const transactions = AppState.ofxData.transactions;
+    
+    // Calculate statistics
+    const stats = calculateTransactionStats(transactions);
+    renderStatsCards(stats);
+    
+    // Render charts only if Chart.js is available
+    if (typeof Chart !== 'undefined') {
+      renderCashFlowChart(transactions);
+      renderCategoryChart(transactions);
+      renderBalanceChart(transactions);
+      renderDailySummaryChart(transactions);
+    }
+    
+    // Animate charts with GSAP if available (without scrollTrigger plugin)
+    if (typeof gsap !== 'undefined') {
+      gsap.from('.chart-card', {
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.5,
+        ease: 'power2.out',
+        delay: 0.2
+      });
+      
+      gsap.from('.stat-card', {
+        y: 20,
+        opacity: 0,
+        stagger: 0.08,
+        duration: 0.4,
+        ease: 'back.out(1.5)',
+        delay: 0.1
+      });
+    }
+  } catch (e) {
+    console.warn('Analytics rendering skipped:', e);
   }
 }
 
@@ -3116,33 +3123,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event listeners
     setupEventListeners();
     
-    // GSAP Page Load Animation
-    if (typeof gsap !== 'undefined') {
-      const timeline = gsap.timeline();
-      
-      // Header slide down
-      timeline.from('.app-header', {
-        y: -80,
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power3.out'
-      });
-      
-      // Upload zone scale in
-      timeline.from('.upload-zone', {
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.4,
-        ease: 'back.out(1.5)'
-      }, '-=0.2');
-      
-      // Info section fade in
-      timeline.from('.info-section', {
-        y: 20,
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.out'
-      }, '-=0.1');
+    // GSAP Page Load Animation (wrapped in try-catch for safety)
+    try {
+      if (typeof gsap !== 'undefined') {
+        const timeline = gsap.timeline();
+        
+        // Header slide down
+        timeline.from('.app-header', {
+          y: -80,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power3.out'
+        });
+        
+        // Upload zone scale in
+        timeline.from('.upload-zone', {
+          scale: 0.9,
+          opacity: 0,
+          duration: 0.4,
+          ease: 'back.out(1.5)'
+        }, '-=0.2');
+        
+        // Info section fade in
+        timeline.from('.info-section', {
+          y: 20,
+          opacity: 0,
+          duration: 0.3,
+          ease: 'power2.out'
+        }, '-=0.1');
+      }
+    } catch (e) {
+      console.warn('GSAP animation skipped:', e);
     }
     
     console.log('[OFX Reader] Application initialized successfully');
