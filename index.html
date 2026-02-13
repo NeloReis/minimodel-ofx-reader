@@ -1468,10 +1468,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Analytics Section */
 .analytics-section {
   display: none;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
   animation: fadeSlideIn 0.5s ease-out;
-  max-height: 35vh;
-  overflow-y: auto;
 }
 
 .analytics-section.visible {
@@ -1512,63 +1510,60 @@ h1, h2, h3, h4, h5, h6 {
 
 .stat-card {
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
   border: 1px solid var(--border-subtle);
   text-align: center;
-  transition: all var(--transition-base);
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
 }
 
 .stat-card .stat-icon {
-  font-size: 1.5rem;
-  margin-bottom: var(--space-2);
+  font-size: 1rem;
+  margin-bottom: var(--space-1);
   display: block;
 }
 
 .stat-card .stat-label {
-  font-size: var(--font-size-xs);
+  font-size: 0.65rem;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: var(--space-1);
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
 }
 
 .stat-card .stat-value {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  font-weight: bold;
 }
 
 .stat-card .stat-value.credit {
-  color: var(--chart-credit);
+  color: #4caf50;
+  font-weight: bold;
 }
 
 .stat-card .stat-value.debit {
-  color: var(--chart-debit);
+  color: #f44336;
+  font-weight: bold;
 }
 
 .stat-card .stat-value.neutral {
   color: var(--text-primary);
+  font-weight: bold;
 }
 
 /* Chart Containers */
 .chart-card {
   background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
   border: 1px solid var(--border-subtle);
-  min-height: 200px;
+  min-height: 160px;
 }
 
 .chart-card .chart-title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-1);
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -1580,13 +1575,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .chart-container {
   position: relative;
-  height: 180px;
+  height: 140px;
   width: 100%;
 }
 
 @media (max-width: 600px) {
   .chart-container {
-    height: 150px;
+    height: 120px;
   }
 }
 
