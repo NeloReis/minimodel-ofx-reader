@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Leitor de arquivos OFX de bancos brasileiros">
   <title>OFX Reader - Leitor de Extratos Bancários</title>
+  
+  <!-- Phosphor Icons (CDN) -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <!-- Chart.js for Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- GSAP for Animations -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3"></script>
+  
   <style>
 /* ═══════════════════════════════════════════════════════════
    OFX READER - COMPLETE STYLESHEET
@@ -1438,6 +1448,214 @@ h1, h2, h3, h4, h5, h6 {
 .mt-6 { margin-top: var(--space-6); }
 .mb-4 { margin-bottom: var(--space-4); }
 .mb-6 { margin-bottom: var(--space-6); }
+
+/* ═══════════════════════════════════════════════════════════
+   ANALYTICS DASHBOARD - Chart.js Integration
+   ═══════════════════════════════════════════════════════════ */
+
+/* Chart Colors */
+:root {
+  --chart-credit: #4caf50;
+  --chart-debit: #f44336;
+  --chart-primary: #1976d2;
+  --chart-accent: #00e5ff;
+  --chart-purple: #a855f7;
+  --chart-gold: #fbbf24;
+  --chart-teal: #14b8a6;
+  --chart-orange: #f97316;
+}
+
+/* Analytics Section */
+.analytics-section {
+  display: none;
+  margin-bottom: var(--space-6);
+  animation: fadeSlideIn 0.5s ease-out;
+}
+
+.analytics-section.visible {
+  display: block;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stats Cards */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.stat-card .stat-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-2);
+  display: block;
+}
+
+.stat-card .stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-1);
+}
+
+.stat-card .stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.stat-card .stat-value.credit {
+  color: var(--chart-credit);
+}
+
+.stat-card .stat-value.debit {
+  color: var(--chart-debit);
+}
+
+.stat-card .stat-value.neutral {
+  color: var(--text-primary);
+}
+
+/* Chart Containers */
+.chart-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  min-height: 280px;
+}
+
+.chart-card .chart-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.chart-card .chart-title i {
+  color: var(--chart-accent);
+}
+
+.chart-container {
+  position: relative;
+  height: 220px;
+  width: 100%;
+}
+
+/* Search & Filter Bar */
+.filter-bar {
+  display: none;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  align-items: center;
+}
+
+.filter-bar.visible {
+  display: flex;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.filter-select {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.result-count {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* Animation Keyframes */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Phosphor Icons Size Overrides */
+i.ph {
+  font-size: 1.25em;
+  line-height: 1;
+}
   </style>
 </head>
 <body>
@@ -1506,6 +1724,74 @@ h1, h2, h3, h4, h5, h6 {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- ANALYTICS DASHBOARD -->
+      <div class="analytics-section" id="analyticsSection">
+        
+        <!-- Stats Row -->
+        <div class="stats-row" id="statsRow">
+          <div class="stat-card">
+            <span class="stat-icon"><i class="ph ph-arrow-down-left"></i></span>
+            <div class="stat-label">Total Créditos</div>
+            <div class="stat-value credit" id="statCredits">R$ 0,00</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon"><i class="ph ph-arrow-up-right"></i></span>
+            <div class="stat-label">Total Débitos</div>
+            <div class="stat-value debit" id="statDebits">R$ 0,00</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon"><i class="ph ph-wallet"></i></span>
+            <div class="stat-label">Saldo Líquido</div>
+            <div class="stat-value neutral" id="statNet">R$ 0,00</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon"><i class="ph ph-arrows-left-right"></i></span>
+            <div class="stat-label">Média Transação</div>
+            <div class="stat-value neutral" id="statAverage">R$ 0,00</div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="analytics-grid">
+          <div class="chart-card">
+            <h3 class="chart-title"><i class="ph ph-chart-bar"></i> Fluxo de Caixa Mensal</h3>
+            <div class="chart-container">
+              <canvas id="cashFlowChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title"><i class="ph ph-chart-pie-slice"></i> Categorias</h3>
+            <div class="chart-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title"><i class="ph ph-chart-line-up"></i> Evolução do Saldo</h3>
+            <div class="chart-container">
+              <canvas id="balanceChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title"><i class="ph ph-trend-up"></i> Resumo Diário</h3>
+            <div class="chart-container">
+              <canvas id="dailySummaryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar" id="filterBar">
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar transação...">
+        <select class="filter-select" id="sortSelect">
+          <option value="date-desc">Data (mais recente)</option>
+          <option value="date-asc">Data (mais antiga)</option>
+          <option value="amount-desc">Valor (maior)</option>
+          <option value="amount-asc">Valor (menor)</option>
+        </select>
+        <span class="result-count" id="resultCount">0 resultados</span>
       </div>
 
       <!-- BOTTOM SECTION - Transaction List -->
