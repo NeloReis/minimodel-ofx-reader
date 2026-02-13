@@ -1468,7 +1468,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Analytics Section */
 .analytics-section {
   display: none;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4);
   animation: fadeSlideIn 0.5s ease-out;
 }
 
@@ -1479,7 +1479,7 @@ h1, h2, h3, h4, h5, h6 {
 .analytics-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 @media (max-width: 900px) {
@@ -1492,8 +1492,8 @@ h1, h2, h3, h4, h5, h6 {
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 @media (max-width: 900px) {
@@ -1504,7 +1504,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 500px) {
   .stats-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1556,20 +1556,20 @@ h1, h2, h3, h4, h5, h6 {
 /* Chart Containers */
 .chart-card {
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
   border: 1px solid var(--border-subtle);
-  min-height: 280px;
+  min-height: 200px;
 }
 
 .chart-card .chart-title {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .chart-card .chart-title i {
@@ -1578,17 +1578,23 @@ h1, h2, h3, h4, h5, h6 {
 
 .chart-container {
   position: relative;
-  height: 220px;
+  height: 180px;
   width: 100%;
+}
+
+@media (max-width: 600px) {
+  .chart-container {
+    height: 150px;
+  }
 }
 
 /* Search & Filter Bar */
 .filter-bar {
   display: none;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-  padding: var(--space-3);
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
   align-items: center;
@@ -1600,8 +1606,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .search-input {
   flex: 1;
-  min-width: 200px;
-  padding: var(--space-2) var(--space-3);
+  min-width: 150px;
+  padding: var(--space-1) var(--space-2);
   background: var(--bg-tertiary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
@@ -1620,7 +1626,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .filter-select {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-2);
   background: var(--bg-tertiary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
