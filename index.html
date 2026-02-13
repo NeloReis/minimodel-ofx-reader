@@ -1021,792 +1021,6 @@ h1, h2, h3, h4, h5, h6 {
 
   </div>
 
-  /* ── Glow Effects (Medium Intensity) ── */
-  --glow-xs: 0 0 10px rgba(var(--accent-rgb), 0.2);
-  --glow-sm: 0 0 20px rgba(var(--accent-rgb), 0.25), 0 0 40px rgba(var(--accent-rgb), 0.1);
-  --glow-md: 0 0 30px rgba(var(--accent-rgb), 0.35), 0 0 60px rgba(var(--accent-rgb), 0.15);
-  --glow-focus: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
-
-  /* ── Transitions (Moderate) ── */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.6, 1);
-
-  /* ── Layout ── */
-  --max-content-width: 1400px;
-  --container-padding: var(--space-6);
-  --header-height: 80px;
-}
-
-/* ────────────────── BASE STYLES ────────────────── */
-
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font-family);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--text-primary);
-  background: linear-gradient(180deg, var(--bg-base) 0%, #050e1a 100%);
-  min-height: 100vh;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  color: var(--text-primary);
-}
-
-h1 { font-size: var(--font-size-2xl); }
-h2 { font-size: var(--font-size-xl); }
-h3 { font-size: var(--font-size-lg); }
-
-p {
-  color: var(--text-secondary);
-  line-height: var(--line-height-relaxed);
-}
-
-/* ── Accessibility ── */
-
-*:focus-visible {
-  outline: none;
-  box-shadow: var(--glow-focus);
-  border-radius: var(--radius-sm);
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ────────────────── LAYOUT ────────────────── */
-
-.app-container {
-  max-width: var(--max-content-width);
-  margin: 0 auto;
-  padding: var(--container-padding);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-/* ────────────────── HEADER ────────────────── */
-
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-6) 0;
-  border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: var(--space-4);
-}
-
-.app-title {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-align: center;
-  letter-spacing: -0.02em;
-}
-
-.app-subtitle {
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: var(--font-size-base);
-  margin-top: var(--space-2);
-}
-
-/* ────────────────── UPLOAD ZONE ────────────────── */
-
-.upload-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.upload-zone {
-  border: 2px dashed var(--border-default);
-  border-radius: var(--radius-lg);
-  padding: var(--space-10) var(--space-8);
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  background: var(--bg-primary);
-  position: relative;
-  overflow: hidden;
-}
-
-.upload-zone::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(var(--accent-rgb), 0.1);
-  transition: width var(--transition-slow), height var(--transition-slow);
-}
-
-.upload-zone:hover,
-.upload-zone.dragover {
-  border-color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.05);
-  box-shadow: var(--glow-sm);
-  transform: translateY(-2px);
-}
-
-.upload-zone:hover::before,
-.upload-zone.dragover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.upload-icon {
-  font-size: 3rem;
-  color: var(--accent);
-  margin-bottom: var(--space-4);
-  display: block;
-}
-
-.upload-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  margin-bottom: var(--space-2);
-}
-
-.upload-subtitle {
-  color: var(--text-secondary);
-  font-size: var(--font-size-base);
-  margin-bottom: var(--space-4);
-}
-
-.upload-hint {
-  color: var(--text-tertiary);
-  font-size: var(--font-size-sm);
-}
-
-.file-input {
-  display: none;
-}
-
-/* ────────────────── LOADING STATE ────────────────── */
-
-.loading-container {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-8);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-}
-
-.loading-container.visible {
-  display: flex;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--border-default);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  color: var(--text-secondary);
-  font-size: var(--font-size-base);
-}
-
-/* ────────────────── ERROR MESSAGE ────────────────── */
-
-.error-message {
-  display: none;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  background: rgba(var(--color-error-rgb), 0.1);
-  border: 1px solid rgba(var(--color-error-rgb), 0.3);
-  border-left: 4px solid var(--color-error);
-  border-radius: var(--radius-md);
-  color: var(--color-error);
-}
-
-.error-message.visible {
-  display: flex;
-}
-
-.error-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.error-text {
-  flex: 1;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-relaxed);
-}
-
-/* ────────────────── DATA SECTION ────────────────── */
-
-.data-section {
-  display: none;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-.data-section.visible {
-  display: flex;
-}
-
-/* ────────────────── METADATA CARDS ────────────────── */
-
-.metadata-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.section-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  margin-bottom: var(--space-2);
-}
-
-.metadata-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-4);
-}
-
-.metadata-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  transition: all var(--transition-base);
-  position: relative;
-  overflow: hidden;
-}
-
-.metadata-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
-  opacity: 0;
-  transition: opacity var(--transition-base);
-}
-
-.metadata-card:hover {
-  border-color: var(--border-default);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.metadata-card:hover::before {
-  opacity: 1;
-}
-
-.card-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-2);
-}
-
-.card-value {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  word-break: break-word;
-}
-
-.card-value.highlight {
-  color: var(--accent-light);
-}
-
-.card-subvalue {
-  font-size: var(--font-size-sm);
-  color: var(--text-tertiary);
-  margin-top: var(--space-1);
-}
-
-/* ────────────────── TRANSACTION TABLE ────────────────── */
-
-.transactions-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.table-container {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.transaction-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-base);
-}
-
-.transaction-table thead {
-  background: var(--bg-tertiary);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.transaction-table th {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 2px solid var(--border-default);
-  white-space: nowrap;
-}
-
-.transaction-table th.align-right {
-  text-align: right;
-}
-
-.transaction-table tbody tr {
-  border-bottom: 1px solid var(--border-subtle);
-  transition: background-color var(--transition-fast);
-}
-
-.transaction-table tbody tr:hover {
-  background: var(--bg-hover);
-}
-
-.transaction-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.transaction-table td {
-  padding: var(--space-3) var(--space-4);
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.transaction-table td.date-cell {
-  font-family: var(--font-mono);
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.transaction-table td.amount-cell {
-  text-align: right;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-base);
-}
-
-.transaction-table td.amount-cell.credit {
-  color: var(--color-success);
-}
-
-.transaction-table td.amount-cell.debit {
-  color: var(--color-error);
-}
-
-.transaction-table td.description-cell {
-  max-width: 600px;
-  color: var(--text-primary);
-}
-
-/* Transaction count badge */
-.transaction-count {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  background: rgba(var(--accent-rgb), 0.15);
-  border: 1px solid rgba(var(--accent-rgb), 0.3);
-  border-radius: var(--radius-sm);
-  color: var(--accent-light);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-/* ────────────────── RESPONSIVE DESIGN ────────────────── */
-
-/* Tablet (768px) */
-@media (max-width: 768px) {
-  :root {
-    --container-padding: var(--space-4);
-    --header-height: 64px;
-  }
-
-  .app-container {
-    padding: var(--space-4);
-    gap: var(--space-6);
-  }
-
-  .app-title {
-    font-size: var(--font-size-xl);
-  }
-
-  .upload-zone {
-    padding: var(--space-8) var(--space-4);
-  }
-
-  .metadata-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-3);
-  }
-
-  .metadata-card {
-    padding: var(--space-4);
-  }
-
-  .card-value {
-    font-size: var(--font-size-md);
-  }
-
-  .transaction-table {
-    font-size: var(--font-size-sm);
-  }
-
-  .transaction-table th,
-  .transaction-table td {
-    padding: var(--space-2) var(--space-3);
-  }
-
-  .transaction-table td.description-cell {
-    max-width: 300px;
-  }
-}
-
-/* Mobile (480px) */
-@media (max-width: 480px) {
-  .app-container {
-    padding: var(--space-3);
-    gap: var(--space-4);
-  }
-
-  .app-header {
-    padding: var(--space-4) 0;
-  }
-
-  .app-title {
-    font-size: var(--font-size-lg);
-  }
-
-  .upload-zone {
-    padding: var(--space-6) var(--space-3);
-  }
-
-  .upload-title {
-    font-size: var(--font-size-md);
-  }
-
-  .metadata-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .section-title {
-    font-size: var(--font-size-md);
-  }
-
-  /* Stack table on mobile - simplified view */
-  .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .transaction-table {
-    min-width: 600px;
-    font-size: var(--font-size-xs);
-  }
-
-  .transaction-table th,
-  .transaction-table td {
-    padding: var(--space-2);
-  }
-
-  .transaction-table td.description-cell {
-    max-width: 200px;
-  }
-}
-
-/* ────────────────── PRINT STYLES ────────────────── */
-
-@media print {
-  * {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  body {
-    background: white;
-    color: black;
-  }
-
-  .app-container {
-    max-width: none;
-    padding: 0;
-  }
-
-  /* Hide interactive elements */
-  .upload-section,
-  .loading-container,
-  .error-message {
-    display: none !important;
-  }
-
-  .app-header {
-    border-bottom: 2px solid #333;
-    margin-bottom: 1rem;
-  }
-
-  .app-title {
-    color: #000;
-    background: none;
-    -webkit-text-fill-color: initial;
-  }
-
-  .metadata-card {
-    background: white;
-    border: 1px solid #ddd;
-    box-shadow: none;
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  .metadata-card::before {
-    display: none;
-  }
-
-  .card-label {
-    color: #666;
-  }
-
-  .card-value,
-  .card-value.highlight {
-    color: #000;
-  }
-
-  .card-subvalue {
-    color: #666;
-  }
-
-  .table-container {
-    background: white;
-    border: 1px solid #ddd;
-    box-shadow: none;
-  }
-
-  .transaction-table thead {
-    background: #f5f5f5;
-  }
-
-  .transaction-table th {
-    background: #f5f5f5;
-    color: #333;
-    border-bottom: 2px solid #333;
-  }
-
-  .transaction-table tbody tr {
-    border-bottom: 1px solid #ddd;
-  }
-
-  .transaction-table tbody tr:hover {
-    background: transparent;
-  }
-
-  .transaction-table td {
-    color: #000;
-  }
-
-  .transaction-table td.amount-cell.credit {
-    color: #2e7d32;
-  }
-
-  .transaction-table td.amount-cell.debit {
-    color: #c62828;
-  }
-
-  .transaction-table td.date-cell {
-    color: #666;
-  }
-
-  /* Ensure table fits on page */
-  .transaction-table {
-    font-size: 10pt;
-  }
-
-  .transaction-table th,
-  .transaction-table td {
-    padding: 0.25rem 0.5rem;
-  }
-
-  .section-title {
-    color: #000;
-    margin-top: 1rem;
-  }
-
-  .transaction-count {
-    background: #f5f5f5;
-    border-color: #ddd;
-    color: #333;
-  }
-}
-
-/* ────────────────── UTILITY CLASSES ────────────────── */
-
-.hidden {
-  display: none !important;
-}
-
-.visible {
-  display: block !important;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.text-muted {
-  color: var(--text-muted);
-}
-
-.font-mono {
-  font-family: var(--font-mono);
-}
-
-.mt-4 { margin-top: var(--space-4); }
-.mt-6 { margin-top: var(--space-6); }
-.mb-4 { margin-bottom: var(--space-4); }
-.mb-6 { margin-bottom: var(--space-6); }
-  </style>
-</head>
-<body>
-  <div class="app-container">
-    
-    <!-- HEADER -->
-    <header class="app-header">
-      <div>
-        <h1 class="app-title">OFX Reader</h1>
-        <p class="app-subtitle">Leitor de Extratos Bancários</p>
-      </div>
-    </header>
-
-    <!-- UPLOAD SECTION -->
-    <section class="upload-section">
-      <div class="upload-zone" id="uploadZone">
-        <span class="upload-icon">📄</span>
-        <h2 class="upload-title">Arraste seu arquivo OFX aqui</h2>
-        <p class="upload-subtitle">ou clique para selecionar</p>
-        <p class="upload-hint">Arquivos .ofx de bancos brasileiros</p>
-        <input type="file" id="fileInput" class="file-input" accept=".ofx">
-      </div>
-    </section>
-
-    <!-- LOADING STATE -->
-    <div class="loading-container" id="loadingContainer">
-      <div class="spinner"></div>
-      <span class="loading-text">Processando arquivo...</span>
-    </div>
-
-    <!-- ERROR MESSAGE -->
-    <div class="error-message" id="errorMessage">
-      <span class="error-icon">⚠️</span>
-      <span class="error-text" id="errorText"></span>
-    </div>
-
-    <!-- DATA SECTION (hidden initially) -->
-    <div class="data-section" id="dataSection">
-      
-      <!-- METADATA CARDS -->
-      <section class="metadata-section">
-        <h2 class="section-title">Informações da Conta</h2>
-        <div class="metadata-grid" id="metadataGrid">
-          <!-- Cards will be inserted here by JavaScript -->
-        </div>
-      </section>
-
-      <!-- TRANSACTIONS TABLE -->
-      <section class="transactions-section">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-          <h2 class="section-title" style="margin-bottom: 0;">Transações</h2>
-          <span class="transaction-count" id="transactionCount">
-            <span>📊</span>
-            <span id="countText">0 transações</span>
-          </span>
-        </div>
-        <div class="table-container">
-          <table class="transaction-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th class="align-right">Valor</th>
-                <th>Descrição</th>
-              </tr>
-            </thead>
-            <tbody id="transactionTableBody">
-              <!-- Rows will be inserted here by JavaScript -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-    </div>
-
-  </div>
-
   <script>
 'use strict';
 
@@ -2328,9 +1542,12 @@ function render() {
   // Get containers
   const loadingContainer = document.getElementById('loadingContainer');
   const errorMessage = document.getElementById('errorMessage');
-  const dataSection = document.getElementById('dataSection');
+  const infoSection = document.getElementById('infoSection');
+  const bottomSection = document.getElementById('bottomSection');
+  const headerStatus = document.getElementById('headerStatus');
+  const uploadZone = document.getElementById('uploadZone');
   
-  if (!loadingContainer || !errorMessage || !dataSection) {
+  if (!loadingContainer || !errorMessage) {
     console.error('[render] Required DOM elements not found');
     return;
   }
@@ -2338,20 +1555,37 @@ function render() {
   // Reset visibility
   loadingContainer.classList.remove('visible');
   errorMessage.classList.remove('visible');
-  dataSection.classList.remove('visible');
+  
+  // Hide data sections by default
+  if (infoSection) infoSection.style.display = 'none';
+  if (bottomSection) bottomSection.style.display = 'none';
+  
+  // Reset upload zone if not in success state
+  if (uploadZone && AppState.status !== 'success') {
+    uploadZone.classList.remove('has-file');
+  }
   
   switch (AppState.status) {
     case 'initial':
-      // Upload section visible, others hidden (default state)
+      if (headerStatus) {
+        headerStatus.innerHTML = '<span>📄</span><span>Aguardando arquivo</span>';
+      }
       break;
       
     case 'loading':
       loadingContainer.classList.add('visible');
+      if (headerStatus) {
+        headerStatus.innerHTML = '<span>⏳</span><span>Processando...</span>';
+      }
       break;
       
     case 'success':
-      dataSection.classList.add('visible');
-      renderMetadata();
+      if (infoSection) infoSection.style.display = 'flex';
+      if (bottomSection) bottomSection.style.display = 'flex';
+      if (headerStatus) {
+        headerStatus.innerHTML = '<span>✅</span><span>Arquivo carregado</span>';
+      }
+      renderInfoCards();
       renderTransactions();
       break;
       
@@ -2361,10 +1595,12 @@ function render() {
       if (errorText) {
         errorText.textContent = AppState.error || 'An error occurred';
       }
+      if (headerStatus) {
+        headerStatus.innerHTML = '<span>❌</span><span>Erro</span>';
+      }
       break;
       
     default:
-      // Unknown state - show error
       errorMessage.classList.add('visible');
       const errorTextDefault = document.getElementById('errorText');
       if (errorTextDefault) {
@@ -2374,56 +1610,51 @@ function render() {
 }
 
 /**
- * Render metadata cards
+ * Render info cards (right column)
  */
-function renderMetadata() {
-  const container = document.getElementById('metadataGrid');
+function renderInfoCards() {
+  const container = document.getElementById('infoGrid');
+  const uploadZone = document.getElementById('uploadZone');
+  
   if (!container || !AppState.ofxData) return;
+  
+  // Update upload zone to show file loaded state
+  if (uploadZone) {
+    uploadZone.classList.add('has-file');
+    uploadZone.innerHTML = `
+      <span class="upload-icon">✅</span>
+      <h2 class="upload-title">${escapeHtml(AppState.fileName || 'Arquivo carregado')}</h2>
+      <p class="upload-subtitle">Clique para carregar outro arquivo</p>
+      <input type="file" id="fileInput" class="file-input" accept=".ofx">
+    `;
+    // Re-attach event listeners
+    setupUploadZoneEvents();
+  }
   
   container.innerHTML = '';
   const metadata = AppState.ofxData.metadata;
   
-  // Define cards
+  // Define cards with icons
   const cards = [
-    {
-      label: 'Banco',
-      value: metadata.bankName || 'N/A',
-      subvalue: metadata.bankId ? `Código: ${metadata.bankId}` : null,
-    },
-    {
-      label: 'Conta',
-      value: metadata.accountId || 'N/A',
-      subvalue: metadata.accountType || null,
-    },
-    {
-      label: 'Agência',
-      value: metadata.branchId || 'N/A',
-      subvalue: null,
-    },
-    {
-      label: 'Período',
-      value: metadata.startDate && metadata.endDate 
-        ? `${metadata.startDate} a ${metadata.endDate}`
-        : 'N/A',
-      subvalue: null,
-    },
-    {
-      label: 'Saldo',
-      value: metadata.balance != null ? formatCurrency(metadata.balance) : 'N/A',
-      subvalue: metadata.balanceDate ? `Em ${metadata.balanceDate}` : null,
-      highlight: metadata.balance != null,
-    },
-    {
-      label: 'Moeda',
-      value: metadata.currency || 'N/A',
-      subvalue: null,
-    },
+    { icon: '🏦', label: 'Banco', value: metadata.bankName || 'N/A', subvalue: metadata.bankId ? `ID: ${metadata.bankId}` : null },
+    { icon: '💳', label: 'Conta', value: metadata.accountId || 'N/A', subvalue: metadata.accountType || null },
+    { icon: '🔖', label: 'Agência', value: metadata.branchId || 'N/A', subvalue: null },
+    { icon: '📅', label: 'Período', value: metadata.startDate && metadata.endDate ? `${metadata.startDate} - ${metadata.endDate}` : 'N/A', subvalue: null },
+    { icon: '💰', label: 'Saldo', value: metadata.balance != null ? formatCurrency(metadata.balance) : 'N/A', subvalue: metadata.balanceDate || null, highlight: metadata.balance != null, isBalance: true },
+    { icon: '💵', label: 'Moeda', value: metadata.currency || 'BRL', subvalue: null },
   ];
   
   // Create cards
   for (const card of cards) {
     const cardEl = document.createElement('div');
-    cardEl.className = 'metadata-card';
+    let cardClass = 'info-card';
+    if (card.highlight) cardClass += ' highlight';
+    cardEl.className = cardClass;
+    
+    const icon = document.createElement('div');
+    icon.className = 'card-icon';
+    icon.textContent = card.icon;
+    cardEl.appendChild(icon);
     
     const label = document.createElement('div');
     label.className = 'card-label';
@@ -2431,7 +1662,12 @@ function renderMetadata() {
     cardEl.appendChild(label);
     
     const value = document.createElement('div');
-    value.className = card.highlight ? 'card-value highlight' : 'card-value';
+    let valueClass = 'card-value';
+    if (card.highlight) valueClass += ' highlight';
+    if (card.isBalance && metadata.balance != null) {
+      valueClass += metadata.balance >= 0 ? ' balance-positive' : ' balance-negative';
+    }
+    value.className = valueClass;
     value.textContent = card.value;
     cardEl.appendChild(value);
     
@@ -2447,48 +1683,52 @@ function renderMetadata() {
 }
 
 /**
- * Render transaction table
+ * Render transaction list (scrollable)
  */
 function renderTransactions() {
-  const tbody = document.getElementById('transactionTableBody');
-  const countText = document.getElementById('countText');
+  const list = document.getElementById('transactionList');
+  const countElement = document.getElementById('transactionCount');
+  const bottomSection = document.getElementById('bottomSection');
   
-  if (!tbody || !AppState.ofxData) return;
+  if (!list || !AppState.ofxData) return;
   
-  tbody.innerHTML = '';
+  if (bottomSection) {
+    bottomSection.style.display = 'flex';
+  }
+  
+  list.innerHTML = '';
   const transactions = AppState.ofxData.transactions;
   
   // Update count
-  if (countText) {
+  if (countElement) {
     const count = transactions.length;
-    countText.textContent = `${count} transação${count !== 1 ? 'ões' : ''}`;
+    countElement.innerHTML = `<span>${count}</span> transação${count !== 1 ? 'ões' : ''}`;
   }
   
-  // Create rows
-  for (const transaction of transactions) {
-    const row = document.createElement('tr');
+  // Create list items
+  transactions.forEach((transaction, index) => {
+    const item = document.createElement('li');
+    item.className = 'transaction-item';
     
-    // Date cell
-    const dateCell = document.createElement('td');
-    dateCell.className = 'date-cell';
-    dateCell.textContent = transaction.date;
-    row.appendChild(dateCell);
+    const dateEl = document.createElement('span');
+    dateEl.className = 'transaction-date';
+    dateEl.textContent = transaction.date;
+    item.appendChild(dateEl);
     
-    // Amount cell
-    const amountCell = document.createElement('td');
+    const amountEl = document.createElement('span');
     const amountClass = transaction.amount >= 0 ? 'credit' : 'debit';
-    amountCell.className = `amount-cell ${amountClass}`;
-    amountCell.textContent = formatCurrency(transaction.amount);
-    row.appendChild(amountCell);
+    amountEl.className = `transaction-amount ${amountClass}`;
+    amountEl.textContent = formatCurrency(transaction.amount);
+    item.appendChild(amountEl);
     
-    // Description cell
-    const descCell = document.createElement('td');
-    descCell.className = 'description-cell';
-    descCell.textContent = transaction.description;
-    row.appendChild(descCell);
+    const descEl = document.createElement('span');
+    descEl.className = 'transaction-description';
+    descEl.textContent = transaction.description;
+    descEl.title = transaction.description;
+    item.appendChild(descEl);
     
-    tbody.appendChild(row);
-  }
+    list.appendChild(item);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2496,43 +1736,37 @@ function renderTransactions() {
 // ═══════════════════════════════════════════════════════════
 
 /**
- * Set up all event listeners
+ * Set up upload zone event listeners
  */
-function setupEventListeners() {
+function setupUploadZoneEvents() {
   const uploadZone = document.getElementById('uploadZone');
   const fileInput = document.getElementById('fileInput');
   
-  if (!uploadZone || !fileInput) {
-    throw new Error('Required DOM elements not found');
-  }
+  if (!uploadZone || !fileInput) return;
   
-  // Upload zone click
-  uploadZone.addEventListener('click', safeHandler(function() {
+  uploadZone.onclick = function() {
     fileInput.click();
-  }));
+  };
   
-  // File input change
-  fileInput.addEventListener('change', safeHandler(function(e) {
+  fileInput.onchange = function(e) {
     const file = e.target.files[0];
     if (file) {
       handleFileUpload(file);
     }
-    // Reset input so same file can be selected again
     e.target.value = '';
-  }));
+  };
   
-  // Drag and drop
-  uploadZone.addEventListener('dragover', safeHandler(function(e) {
+  uploadZone.ondragover = function(e) {
     e.preventDefault();
     uploadZone.classList.add('dragover');
-  }));
+  };
   
-  uploadZone.addEventListener('dragleave', safeHandler(function(e) {
+  uploadZone.ondragleave = function(e) {
     e.preventDefault();
     uploadZone.classList.remove('dragover');
-  }));
+  };
   
-  uploadZone.addEventListener('drop', safeHandler(function(e) {
+  uploadZone.ondrop = function(e) {
     e.preventDefault();
     uploadZone.classList.remove('dragover');
     
@@ -2540,7 +1774,14 @@ function setupEventListeners() {
     if (file) {
       handleFileUpload(file);
     }
-  }));
+  };
+}
+
+/**
+ * Set up all event listeners
+ */
+function setupEventListeners() {
+  setupUploadZoneEvents();
 }
 
 // ═══════════════════════════════════════════════════════════
