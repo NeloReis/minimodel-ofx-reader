@@ -3149,44 +3149,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('[DEBUG] - Chart:', typeof Chart !== 'undefined' ? 'LOADED' : 'NOT LOADED');
     console.log('[DEBUG] - phosphor icons:', typeof Ph !== 'undefined' ? 'LOADED' : 'NOT LOADED');
     
-    console.log('[DEBUG] Step 5: GSAP animations...');
-    if (typeof gsap !== 'undefined') {
-      console.log('[DEBUG] GSAP is available, creating timeline...');
-      const timeline = gsap.timeline();
-      
-      timeline.from('.app-header', {
-        y: -80,
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power3.out'
-      });
-      
-      timeline.from('.upload-zone', {
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.4,
-        ease: 'back.out(1.5)'
-      }, '-=0.2');
-      
-      timeline.from('.info-section', {
-        y: 20,
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.out'
-      }, '-=0.1');
-      
-      console.log('[DEBUG] GSAP timeline created successfully');
-      
-      // Check visibility after animation
-      setTimeout(function() {
-        var header = document.querySelector('.app-header');
-        var upload = document.querySelector('.upload-zone');
-        console.log('[DEBUG] Post-animation check - Header:', header ? (window.getComputedStyle(header).opacity) : 'NOT FOUND');
-        console.log('[DEBUG] Post-animation check - Upload:', upload ? (window.getComputedStyle(upload).opacity) : 'NOT FOUND');
-      }, 1500);
-    } else {
-      console.log('[DEBUG] GSAP not available, skipping animations');
-    }
+    console.log('[DEBUG] Step 5: GSAP animations DISABLED for now');
+    console.log('[DEBUG] Skipping GSAP to fix visibility issue');
     
     console.log('[DEBUG] Initialization complete!');
     console.log('[OFX Reader] Application initialized successfully');
