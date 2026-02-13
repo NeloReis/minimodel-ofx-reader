@@ -47,19 +47,28 @@ Transform cryptic OFX files with encoding issues into a clean, professional dark
 7. **UI Header:**
    - Application title/branding
    - Professional appearance
+8. **Analytics dashboard (v2.0):**
+   - Summary stat cards: Total Credits, Total Debits, Net Balance, Avg Transaction
+   - Cash flow bar chart (credits vs debits grouped by month)
+   - Category doughnut chart (keyword-based auto-categorization)
+   - Balance evolution line chart (running cumulative balance)
+   - Daily summary bar chart (last 10 days)
+9. **Transaction search:**
+   - Text search filtering across description, date, and type
+10. **Transaction sorting:**
+    - Sort by date ascending/descending
+    - Sort by amount ascending/descending
+11. **Result count display:**
+    - Shows filtered count vs total count
 
 ### 2.2 Explicitly NOT in Scope
 
-- Multiple file loading
-- Filtering transactions
-- Searching transactions
-- Sorting transactions (display in original file order)
+- Multiple file loading simultaneously
 - Editing transactions
 - Exporting to other formats
 - User accounts or authentication
 - Data persistence (no localStorage)
-- Transaction categorization
-- Charts or graphs
+- Manual transaction categorization (auto-categorization by keyword is in scope)
 
 ---
 
@@ -68,8 +77,11 @@ Transform cryptic OFX files with encoding issues into a clean, professional dark
 | Decision | Choice | Reason |
 |----------|--------|--------|
 | **Architecture** | Single HTML file | User requirement: self-contained, portable, offline-capable |
-| **JavaScript** | Vanilla ES6+ | No dependencies needed, full browser support |
+| **JavaScript** | Vanilla ES6+ | Core logic has no dependencies |
 | **CSS** | Inline in `<style>` tag | Keep everything in one file |
+| **Charts** | Chart.js (CDN) | Rich chart rendering for analytics dashboard |
+| **Animations** | GSAP (CDN) | Professional staggered animations for cards/charts |
+| **Icons** | Phosphor Icons (CDN) | Lightweight icon set for stat cards and charts |
 | **File Reading** | FileReader API | Native browser API, no dependencies |
 | **Parsing** | Custom regex-based parser | OFX is SGML-like with inconsistent structure, regex most reliable |
 | **Encoding** | Force UTF-8 read with Windows-1252 character mapping | Handle declared encoding mismatches |
@@ -102,8 +114,10 @@ OFX files use SGML format (not XML), with optional closing tags and inconsistent
     {
       "type": "string (CREDIT|DEBIT|PAYMENT|OTHER)",
       "date": "string (DD-MM-YYYY)",
+      "dateRaw": "string (YYYY-MM-DD) — ISO format for sorting/grouping",
       "amount": "number",
-      "description": "string"
+      "description": "string",
+      "memo": "string — alias of description, for backward compatibility"
     }
   ]
 }
@@ -353,11 +367,16 @@ FUNCTION parseTransaction(block):
     ELSE:
         type = "OTHER"
     
+    // Build ISO date for sorting/charting: DD-MM-YYYY → YYYY-MM-DD
+    dateRaw = year + "-" + month + "-" + day  // from the parsed date components
+    
     RETURN {
         type: type,
         date: date,
+        dateRaw: dateRaw,
         amount: amount,
-        description: memo trim whitespace
+        description: memo trim whitespace,
+        memo: memo trim whitespace   // alias for backward compatibility
     }
 END FUNCTION
 ```
@@ -635,6 +654,15 @@ Each criterion is testable with a YES/NO procedure:
 | 16 | Balance displays when available | Check file with balance. Balance card shows amount? YES/NO |
 | 17 | Dark theme is professional | Visual inspection. Looks professional and dark blue theme? YES/NO |
 | 18 | Error on non-OFX file | Drop .txt file. Error message displays? YES/NO |
+| 19 | Analytics stats show correct totals | Load file. Sum credits in stats card matches manual sum of green values? YES/NO |
+| 20 | Cash flow chart renders | Load file. Bar chart with credits/debits visible? YES/NO |
+| 21 | Category chart renders | Load file. Doughnut chart with labeled categories visible? YES/NO |
+| 22 | Balance evolution chart renders | Load file. Line chart with balance trend visible? YES/NO |
+| 23 | Daily summary chart renders | Load file. Daily bar chart visible? YES/NO |
+| 24 | Search filters transactions | Type partial description in search box. List updates to show only matches? YES/NO |
+| 25 | Sort by date ascending works | Select "Data (mais antiga)". First transaction has earliest date? YES/NO |
+| 26 | Sort by amount descending works | Select "Valor (maior)". First transaction has largest amount? YES/NO |
+| 27 | Result count updates on search | Type search term. Count shows "X de Y transações"? YES/NO |
 
 ---
 
@@ -843,15 +871,17 @@ ADRs are stored in `.github/adrs/` directory:
 
 ## ⚠️ WARNINGS FOR DOWNSTREAM AGENTS
 
-1. **DO NOT add features not in Section 2** - No filtering, searching, sorting, or export features
-2. **DO NOT change data structures from Section 4** - The OFXData schema is final
+1. **DO NOT add features not in Section 2** - The feature list is final
+2. **DO NOT change data structures from Section 4** - Transaction objects MUST have `dateRaw` (ISO) and `memo` (alias of description)
 3. **DO NOT simplify algorithms from Section 5** - All edge case handling is mandatory
 4. **DO NOT skip edge cases from Section 7** - Every edge case must be handled
-5. **DO NOT use external libraries or dependencies** - Pure vanilla JavaScript only
+5. **CDN dependencies are allowed** - Chart.js, GSAP, and Phosphor Icons are approved
 6. **DO NOT create separate CSS/JS files** - Everything must be inline in single HTML
 7. **DO NOT assume encoding** - Must handle Windows-1252 in "ASCII" files
 8. **DO NOT ignore malformed data** - Must gracefully handle and log issues
-9. **IF ANYTHING IS UNCLEAR** - ASK THE USER, do not make assumptions
+9. **All chart/filter/sort functions MUST use `dateRaw` for date operations** — never parse DD-MM-YYYY strings with `new Date()`
+10. **All chart/filter functions MUST use `description` (or `memo` alias) for text** — never reference non-existent properties
+11. **IF ANYTHING IS UNCLEAR** - ASK THE USER, do not make assumptions
 
 ---
 
@@ -951,10 +981,60 @@ The following UI enhancements create a polished, professional full-page responsi
 
 ---
 
+## 12. Known Bugs (v2.1 Fix List)
+
+These bugs exist in the current `index.html` and MUST be fixed by the Implementer. Each bug is traced to a specific code location.
+
+### Bug 1: Transaction objects missing `dateRaw` and `memo` properties
+
+**Location:** `parseTransaction()` function (~line 2230)
+**Problem:** The function returns `{ type, date, amount, description }` but multiple downstream functions reference `t.dateRaw` and `t.memo` which don't exist.
+**Impact:** All 4 charts silently produce empty/wrong data. Search and sort don't work.
+**Fix:** Add `dateRaw` (ISO YYYY-MM-DD from parsed date components) and `memo` (alias of `description`) to the returned object.
+
+### Bug 2: `getMonthLabel()` parses DD-MM-YYYY incorrectly
+
+**Location:** `getMonthLabel()` function (~line 2704)
+**Problem:** `new Date("01-10-2025")` with DD-MM-YYYY format is invalid or misinterpreted by browsers.
+**Fix:** Use `dateRaw` (ISO format) instead, or manually parse the DD-MM-YYYY string.
+
+### Bug 3: Date-based sorting uses invalid date parsing
+
+**Location:** `filterTransactions()` sort block
+**Problem:** `new Date(a.dateRaw)` — even after Bug 1 is fixed, sorting must use the ISO `dateRaw` field for correct ordering.
+**Fix:** Ensure sort comparisons use `dateRaw` (which will be ISO format after Bug 1 fix).
+
+### Bug 4: `renderFilteredTransactions()` uses `transaction.memo` instead of `transaction.description`
+
+**Location:** `renderFilteredTransactions()` function
+**Problem:** References `transaction.memo` for display text, but after Bug 1 fix this will work since `memo` will be an alias. However, the `filterTransactions()` function also references `t.memo` for search — this will also be fixed by Bug 1.
+**Resolution:** Bug 1 fix (adding `memo` alias) resolves this.
+
+### Bug 5: `renderTransactions()` and `renderFilteredTransactions()` are near-duplicates
+
+**Location:** Both functions
+**Problem:** Both build identical DOM structure but `renderTransactions` uses `description` and `renderFilteredTransactions` uses `memo`. After Bug 1, both work, but DRY violation remains.
+**Fix:** Extract shared transaction item creation into a helper function.
+
+### Bug 6: Duplicate CSS variable declarations
+
+**Location:** `:root` CSS block (~lines 63-100)
+**Problem:** `--text-primary`, `--text-secondary`, `--text-muted`, `--accent`, and related variables are declared twice with different values. The second declaration silently overrides the first.
+**Fix:** Remove the first (dead) set of declarations.
+
+### Bug 7: Debug console.log statements in production
+
+**Location:** `DOMContentLoaded` handler (~lines 3280-3330)
+**Problem:** 15+ `console.log('[DEBUG]...')` statements left in production code.
+**Fix:** Remove all debug logging. Keep only the final success message.
+
+---
+
 ## Document Metadata
 
-- **Version:** 2.0
+- **Version:** 2.1
 - **Created:** 2026-02-13
+- **Updated:** 2026-02-13
 - **Author:** Architect Agent
-- **Status:** Complete - Ready for Implementer
-- **Changes:** Full UI redesign to dashboard layout
+- **Status:** Bug fix pass — Ready for Implementer
+- **Changes:** v2.1: Documented 7 known bugs, updated scope to match actual features (analytics/search/sort), updated data schema with dateRaw/memo, updated technology decisions with CDN deps
