@@ -8,7 +8,8 @@
   <style>
 /* ═══════════════════════════════════════════════════════════
    OFX READER - COMPLETE STYLESHEET
-   Dark Blue Professional Theme with Medium Glow
+   Dark Blue Professional Theme - ENHANCED EDITION
+   Premium Polish, Smooth Animations, Refined Visuals
    ═══════════════════════════════════════════════════════════ */
 
 /* ────────────────── RESET ────────────────── */
@@ -29,12 +30,21 @@
   --bg-tertiary: #1e3a5f;
   --bg-elevated: #0f2740;
   --bg-hover: rgba(25, 118, 210, 0.08);
+  
+  /* ── Enhanced Gradient Backgrounds ── */
+  --bg-gradient: linear-gradient(135deg, #0a1929 0%, #0d1b2a 50%, #071320 100%);
+  --bg-card-shine: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, transparent 50%);
 
   /* ── Borders ── */
   --border-subtle: rgba(144, 202, 249, 0.08);
   --border-default: #2c5282;
   --border-strong: #3d6ca3;
   --border-focus: #1976d2;
+  
+  /* ── Enhanced Glow ── */
+  --glow-accent: 0 0 20px rgba(25, 118, 210, 0.3);
+  --glow-success: 0 0 15px rgba(76, 175, 80, 0.3);
+  --glow-error: 0 0 15px rgba(244, 67, 54, 0.3);
 
   /* ── Text Colors ── */
   --text-primary: #e3f2fd;
@@ -50,6 +60,10 @@
   --accent-lighter: #64b5f6;
   --accent-dark: #1565c0;
   --accent-darkest: #0d47a1;
+  
+  /* ── Enhanced Gradients ── */
+  --gradient-accent: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+  --gradient-header: linear-gradient(135deg, #0d1b2a 0%, #132f4c 100%);
 
   /* ── Semantic Colors ── */
   --color-success: #4caf50;
@@ -58,6 +72,10 @@
   --color-error-rgb: 244, 67, 54;
   --color-warning: #ff9800;
   --color-info: #42a5f5;
+  
+  /* ── Semantic Gradients ── */
+  --gradient-success: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+  --gradient-error: linear-gradient(135deg, #c62828 0%, #f44336 100%);
 
   /* ── Typography ── */
   --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -69,6 +87,7 @@
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.5rem;
   --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -87,28 +106,29 @@
   --space-8: 2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
+  --space-16: 4rem;
 
   /* ── Border Radius ── */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
 
-  /* ── Shadows ── */
+  /* ── Enhanced Shadows ── */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5), 0 6px 10px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(144, 202, 249, 0.05);
+  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(144, 202, 249, 0.1), var(--glow-accent);
 
-  /* ── Glow Effects (Medium Intensity) ── */
-  --glow-xs: 0 0 10px rgba(var(--accent-rgb), 0.2);
-  --glow-sm: 0 0 20px rgba(var(--accent-rgb), 0.25), 0 0 40px rgba(var(--accent-rgb), 0.1);
-  --glow-md: 0 0 30px rgba(var(--accent-rgb), 0.35), 0 0 60px rgba(var(--accent-rgb), 0.15);
-  --glow-focus: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
-
-  /* ── Transitions (Moderate) ── */
+  /* ── Transitions (Refined) ── */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.6, 1);
+  --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* ── Layout ── */
   --max-content-width: 1400px;
@@ -130,8 +150,25 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   color: var(--text-primary);
-  background: linear-gradient(180deg, var(--bg-base) 0%, #050e1a 100%);
+  background: var(--bg-gradient);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(ellipse at 20% 20%, rgba(25, 118, 210, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(66, 165, 245, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -153,7 +190,7 @@ p {
 
 *:focus-visible {
   outline: none;
-  box-shadow: var(--glow-focus);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.4);
   border-radius: var(--radius-sm);
 }
 
@@ -187,24 +224,71 @@ p {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  position: relative;
+  z-index: 1;
 }
 
 /* ────────────────── HEADER ────────────────── */
 
 .app-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-6) 0;
+  padding: var(--space-8) 0;
   border-bottom: 1px solid var(--border-subtle);
   margin-bottom: var(--space-4);
+  position: relative;
+}
+
+/* Decorative accent line */
+.app-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 2px;
+  background: var(--gradient-accent);
+  border-radius: var(--radius-full);
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.app-logo-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--gradient-accent);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow-md), var(--glow-accent);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: var(--shadow-md), 0 0 20px rgba(25, 118, 210, 0.3);
+  }
+  50% {
+    box-shadow: var(--shadow-md), 0 0 30px rgba(25, 118, 210, 0.5);
+  }
 }
 
 .app-title {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
-  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+  background: linear-gradient(135deg, #e3f2fd 0%, #64b5f6 50%, #42a5f5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -215,8 +299,9 @@ p {
 .app-subtitle {
   text-align: center;
   color: var(--text-secondary);
-  font-size: var(--font-size-base);
-  margin-top: var(--space-2);
+  font-size: var(--font-size-md);
+  margin-top: var(--space-1);
+  opacity: 0.9;
 }
 
 /* ────────────────── UPLOAD ZONE ────────────────── */
@@ -229,8 +314,8 @@ p {
 
 .upload-zone {
   border: 2px dashed var(--border-default);
-  border-radius: var(--radius-lg);
-  padding: var(--space-10) var(--space-8);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-12) var(--space-8);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-base);
@@ -239,7 +324,21 @@ p {
   overflow: hidden;
 }
 
+/* Subtle inner shine */
 .upload-zone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-card-shine);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+/* Animated background ring */
+.upload-zone::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -248,47 +347,65 @@ p {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(var(--accent-rgb), 0.1);
+  background: radial-gradient(circle, rgba(25, 118, 210, 0.15) 0%, transparent 70%);
   transition: width var(--transition-slow), height var(--transition-slow);
 }
 
 .upload-zone:hover,
 .upload-zone.dragover {
   border-color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.05);
-  box-shadow: var(--glow-sm);
-  transform: translateY(-2px);
+  background: rgba(25, 118, 210, 0.05);
+  box-shadow: var(--shadow-lg), var(--glow-accent);
+  transform: translateY(-4px);
 }
 
 .upload-zone:hover::before,
 .upload-zone.dragover::before {
-  width: 300px;
-  height: 300px;
+  opacity: 1;
+}
+
+.upload-zone:hover::after,
+.upload-zone.dragover::after {
+  width: 600px;
+  height: 600px;
 }
 
 .upload-icon {
-  font-size: 3rem;
+  font-size: 3.5rem;
   color: var(--accent);
   margin-bottom: var(--space-4);
   display: block;
+  position: relative;
+  z-index: 1;
+  transition: transform var(--transition-bounce);
+}
+
+.upload-zone:hover .upload-icon {
+  transform: scale(1.1) translateY(-5px);
 }
 
 .upload-title {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   margin-bottom: var(--space-2);
+  position: relative;
+  z-index: 1;
 }
 
 .upload-subtitle {
   color: var(--text-secondary);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   margin-bottom: var(--space-4);
+  position: relative;
+  z-index: 1;
 }
 
 .upload-hint {
   color: var(--text-tertiary);
   font-size: var(--font-size-sm);
+  position: relative;
+  z-index: 1;
 }
 
 .file-input {
@@ -301,20 +418,33 @@ p {
   display: none;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-8);
+  gap: var(--space-4);
+  padding: var(--space-10);
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
 }
 
 .loading-container.visible {
   display: flex;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .spinner {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border: 3px solid var(--border-default);
   border-top-color: var(--accent);
   border-radius: 50%;
@@ -327,7 +457,8 @@ p {
 
 .loading-text {
   color: var(--text-secondary);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
 }
 
 /* ────────────────── ERROR MESSAGE ────────────────── */
@@ -336,20 +467,27 @@ p {
   display: none;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-4);
-  background: rgba(var(--color-error-rgb), 0.1);
-  border: 1px solid rgba(var(--color-error-rgb), 0.3);
+  padding: var(--space-5);
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+  border: 1px solid rgba(244, 67, 54, 0.3);
   border-left: 4px solid var(--color-error);
-  border-radius: var(--radius-md);
-  color: var(--color-error);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
 }
 
 .error-message.visible {
   display: flex;
+  animation: shake 0.5s ease-out, fadeIn 0.3s ease-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
 }
 
 .error-icon {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   flex-shrink: 0;
 }
 
@@ -357,6 +495,7 @@ p {
   flex: 1;
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
+  color: var(--text-primary);
 }
 
 /* ────────────────── DATA SECTION ────────────────── */
@@ -369,6 +508,18 @@ p {
 
 .data-section.visible {
   display: flex;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ────────────────── METADATA CARDS ────────────────── */
@@ -379,11 +530,26 @@ p {
   gap: var(--space-4);
 }
 
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
 .section-title {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.section-title-icon {
+  font-size: 1.25rem;
 }
 
 .metadata-grid {
@@ -395,41 +561,97 @@ p {
 .metadata-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--space-5);
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
+/* Subtle shine effect */
 .metadata-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+  bottom: 0;
+  background: var(--bg-card-shine);
   opacity: 0;
   transition: opacity var(--transition-base);
 }
 
+/* Accent line on hover */
+.metadata-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-base);
+}
+
 .metadata-card:hover {
   border-color: var(--border-default);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-4px);
 }
 
 .metadata-card:hover::before {
   opacity: 1;
 }
 
+.metadata-card:hover::after {
+  transform: scaleX(1);
+}
+
+/* Staggered animation for cards */
+.metadata-card {
+  animation: cardFadeIn 0.5s ease-out backwards;
+}
+
+.metadata-card:nth-child(1) { animation-delay: 0.05s; }
+.metadata-card:nth-child(2) { animation-delay: 0.1s; }
+.metadata-card:nth-child(3) { animation-delay: 0.15s; }
+.metadata-card:nth-child(4) { animation-delay: 0.2s; }
+.metadata-card:nth-child(5) { animation-delay: 0.25s; }
+.metadata-card:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: var(--space-3);
+  background: rgba(25, 118, 210, 0.15);
+  color: var(--accent-light);
+}
+
 .card-label {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
   margin-bottom: var(--space-2);
 }
 
@@ -438,16 +660,31 @@ p {
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
   word-break: break-word;
+  line-height: var(--line-height-tight);
 }
 
 .card-value.highlight {
-  color: var(--accent-light);
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-value.balance-positive {
+  color: var(--color-success);
+}
+
+.card-value.balance-negative {
+  color: var(--color-error);
 }
 
 .card-subvalue {
   font-size: var(--font-size-sm);
-  color: var(--text-tertiary);
-  margin-top: var(--space-1);
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
 /* ────────────────── TRANSACTION TABLE ────────────────── */
@@ -461,18 +698,41 @@ p {
 .table-container {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+/* Horizontal scroll wrapper */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) var(--bg-secondary);
+}
+
+.table-scroll-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: var(--radius-full);
 }
 
 .transaction-table {
   width: 100%;
+  min-width: 700px;
   border-collapse: collapse;
   font-size: var(--font-size-base);
 }
 
 .transaction-table thead {
-  background: var(--bg-tertiary);
+  background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -480,12 +740,12 @@ p {
 
 .transaction-table th {
   text-align: left;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   color: var(--text-secondary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-xs);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   border-bottom: 2px solid var(--border-default);
   white-space: nowrap;
 }
@@ -496,7 +756,13 @@ p {
 
 .transaction-table tbody tr {
   border-bottom: 1px solid var(--border-subtle);
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+/* Subtle alternating rows */
+.transaction-table tbody tr:nth-child(even) {
+  background: rgba(30, 58, 95, 0.15);
 }
 
 .transaction-table tbody tr:hover {
@@ -507,18 +773,36 @@ p {
   border-bottom: none;
 }
 
+/* Row entrance animation */
+.transaction-table tbody tr {
+  animation: rowFadeIn 0.3s ease-out backwards;
+}
+
+@keyframes rowFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .transaction-table td {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  vertical-align: middle;
 }
 
 .transaction-table td.date-cell {
   font-family: var(--font-mono);
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .transaction-table td.amount-cell {
@@ -530,15 +814,18 @@ p {
 
 .transaction-table td.amount-cell.credit {
   color: var(--color-success);
+  font-weight: var(--font-weight-bold);
 }
 
 .transaction-table td.amount-cell.debit {
   color: var(--color-error);
+  font-weight: var(--font-weight-bold);
 }
 
 .transaction-table td.description-cell {
-  max-width: 600px;
+  max-width: 500px;
   color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 /* Transaction count badge */
@@ -546,13 +833,26 @@ p {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  background: rgba(var(--accent-rgb), 0.15);
-  border: 1px solid rgba(var(--accent-rgb), 0.3);
-  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  background: rgba(25, 118, 210, 0.15);
+  border: 1px solid rgba(25, 118, 210, 0.3);
+  border-radius: var(--radius-full);
   color: var(--accent-light);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
+}
+
+/* Empty state */
+.table-empty {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--text-muted);
+}
+
+.table-empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.5;
 }
 
 /* ────────────────── RESPONSIVE DESIGN ────────────────── */
@@ -816,10 +1116,11 @@ p {
     
     <!-- HEADER -->
     <header class="app-header">
-      <div>
+      <div class="app-logo">
+        <div class="app-logo-icon">📊</div>
         <h1 class="app-title">OFX Reader</h1>
-        <p class="app-subtitle">Leitor de Extratos Bancários</p>
       </div>
+      <p class="app-subtitle">Leitor de Extratos Bancários</p>
     </header>
 
     <!-- UPLOAD SECTION -->
@@ -850,7 +1151,12 @@ p {
       
       <!-- METADATA CARDS -->
       <section class="metadata-section">
-        <h2 class="section-title">Informações da Conta</h2>
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-title-icon">🏠</span>
+            Informações da Conta
+          </h2>
+        </div>
         <div class="metadata-grid" id="metadataGrid">
           <!-- Cards will be inserted here by JavaScript -->
         </div>
@@ -858,26 +1164,31 @@ p {
 
       <!-- TRANSACTIONS TABLE -->
       <section class="transactions-section">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-          <h2 class="section-title" style="margin-bottom: 0;">Transações</h2>
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="section-title-icon">📋</span>
+            Transações
+          </h2>
           <span class="transaction-count" id="transactionCount">
             <span>📊</span>
             <span id="countText">0 transações</span>
           </span>
         </div>
         <div class="table-container">
-          <table class="transaction-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th class="align-right">Valor</th>
-                <th>Descrição</th>
-              </tr>
-            </thead>
-            <tbody id="transactionTableBody">
-              <!-- Rows will be inserted here by JavaScript -->
-            </tbody>
-          </table>
+          <div class="table-scroll-wrapper">
+            <table class="transaction-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th class="align-right">Valor</th>
+                  <th>Descrição</th>
+                </tr>
+              </thead>
+              <tbody id="transactionTableBody">
+                <!-- Rows will be inserted here by JavaScript -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -1461,24 +1772,28 @@ function renderMetadata() {
   container.innerHTML = '';
   const metadata = AppState.ofxData.metadata;
   
-  // Define cards
+  // Define cards with icons
   const cards = [
     {
+      icon: '🏦',
       label: 'Banco',
       value: metadata.bankName || 'N/A',
       subvalue: metadata.bankId ? `Código: ${metadata.bankId}` : null,
     },
     {
+      icon: '💳',
       label: 'Conta',
       value: metadata.accountId || 'N/A',
       subvalue: metadata.accountType || null,
     },
     {
+      icon: '🔖',
       label: 'Agência',
       value: metadata.branchId || 'N/A',
       subvalue: null,
     },
     {
+      icon: '📅',
       label: 'Período',
       value: metadata.startDate && metadata.endDate 
         ? `${metadata.startDate} a ${metadata.endDate}`
@@ -1486,12 +1801,15 @@ function renderMetadata() {
       subvalue: null,
     },
     {
+      icon: '💰',
       label: 'Saldo',
       value: metadata.balance != null ? formatCurrency(metadata.balance) : 'N/A',
-      subvalue: metadata.balanceDate ? `Em ${metadata.balanceDate}` : null,
+      subvalue: metadata.balanceDate ? `Atualizado em ${metadata.balanceDate}` : null,
       highlight: metadata.balance != null,
+      isBalance: true,
     },
     {
+      icon: '💵',
       label: 'Moeda',
       value: metadata.currency || 'N/A',
       subvalue: null,
@@ -1503,16 +1821,30 @@ function renderMetadata() {
     const cardEl = document.createElement('div');
     cardEl.className = 'metadata-card';
     
+    // Icon
+    const icon = document.createElement('div');
+    icon.className = 'card-icon';
+    icon.textContent = card.icon;
+    cardEl.appendChild(icon);
+    
+    // Label
     const label = document.createElement('div');
     label.className = 'card-label';
     label.textContent = card.label;
     cardEl.appendChild(label);
     
+    // Value
     const value = document.createElement('div');
-    value.className = card.highlight ? 'card-value highlight' : 'card-value';
+    let valueClass = 'card-value';
+    if (card.highlight) valueClass += ' highlight';
+    if (card.isBalance && metadata.balance != null) {
+      valueClass += metadata.balance >= 0 ? ' balance-positive' : ' balance-negative';
+    }
+    value.className = valueClass;
     value.textContent = card.value;
     cardEl.appendChild(value);
     
+    // Subvalue
     if (card.subvalue) {
       const subvalue = document.createElement('div');
       subvalue.className = 'card-subvalue';
@@ -1542,9 +1874,13 @@ function renderTransactions() {
     countText.textContent = `${count} transação${count !== 1 ? 'ões' : ''}`;
   }
   
-  // Create rows
-  for (const transaction of transactions) {
+  // Create rows with staggered animation
+  transactions.forEach((transaction, index) => {
     const row = document.createElement('tr');
+    
+    // Add staggered animation delay (max 30 for performance)
+    const delay = Math.min(index * 0.02, 0.6);
+    row.style.animationDelay = `${delay}s`;
     
     // Date cell
     const dateCell = document.createElement('td');
@@ -1566,7 +1902,7 @@ function renderTransactions() {
     row.appendChild(descCell);
     
     tbody.appendChild(row);
-  }
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
