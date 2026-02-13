@@ -3321,7 +3321,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('[DEBUG] Step 4: Checking libraries...');
     console.log('[DEBUG] - gsap:', typeof gsap !== 'undefined' ? 'LOADED' : 'NOT LOADED');
     console.log('[DEBUG] - Chart:', typeof Chart !== 'undefined' ? 'LOADED' : 'NOT LOADED');
-    console.log('[DEBUG] - phosphor icons:', typeof Ph !== 'undefined' ? 'LOADED' : 'NOT LOADED');
+    console.log('[DEBUG] - phosphor icons:', document.querySelector('link[href*="phosphor"]') ? 'LOADED' : 'NOT LOADED');
     
     console.log('[DEBUG] Step 5: GSAP animations DISABLED for now');
     console.log('[DEBUG] Skipping GSAP to fix visibility issue');
