@@ -2484,9 +2484,12 @@ function render() {
   // Get containers
   const loadingContainer = document.getElementById('loadingContainer');
   const errorMessage = document.getElementById('errorMessage');
-  const dataSection = document.getElementById('dataSection');
+  const infoSection = document.getElementById('infoSection');
+  const bottomSection = document.getElementById('bottomSection');
+  const headerStatus = document.getElementById('headerStatus');
+  const uploadZone = document.getElementById('uploadZone');
   
-  if (!loadingContainer || !errorMessage || !dataSection) {
+  if (!loadingContainer || !errorMessage) {
     console.error('[render] Required DOM elements not found');
     return;
   }
@@ -2494,20 +2497,36 @@ function render() {
   // Reset visibility
   loadingContainer.classList.remove('visible');
   errorMessage.classList.remove('visible');
-  dataSection.classList.remove('visible');
+  
+  // Hide data sections by default
+  if (infoSection) infoSection.style.display = 'none';
+  if (bottomSection) bottomSection.style.display = 'none';
+  
+  // Reset upload zone if not in success state
+  if (uploadZone && AppState.status !== 'success') {
+    uploadZone.classList.remove('has-file');
+  }
   
   switch (AppState.status) {
     case 'initial':
       // Upload section visible, others hidden (default state)
+      if (headerStatus) {
+        headerStatus.innerHTML = '<span>📄</span><span>Aguardando arquivo</span>';
+      }
       break;
       
     case 'loading':
       loadingContainer.classList.add('visible');
+      if (headerStatus) {
+        headerStatus.innerHTML = '<span>⏳</span><span>Processando...</span>';
+      }
       break;
       
     case 'success':
-      dataSection.classList.add('visible');
-      renderMetadata();
+      // Show info section and transaction list
+      if (infoSection) infoSection.style.display = 'flex';
+      if (bottomSection) bottomSection.style.display = 'flex';
+      renderInfoCards();
       renderTransactions();
       break;
       
@@ -2516,6 +2535,9 @@ function render() {
       const errorText = document.getElementById('errorText');
       if (errorText) {
         errorText.textContent = AppState.error || 'An error occurred';
+      }
+      if (headerStatus) {
+        headerStatus.innerHTML = '<span>❌</span><span>Erro</span>';
       }
       break;
       
@@ -2530,22 +2552,43 @@ function render() {
 }
 
 /**
- * Render metadata cards
+ * Render info cards (right column)
  */
-function renderMetadata() {
-  const container = document.getElementById('metadataGrid');
+function renderInfoCards() {
+  const container = document.getElementById('infoGrid');
+  const headerStatus = document.getElementById('headerStatus');
+  const uploadZone = document.getElementById('uploadZone');
+  
   if (!container || !AppState.ofxData) return;
+  
+  // Update header status
+  if (headerStatus) {
+    headerStatus.innerHTML = '<span>✅</span><span>Arquivo carregado</span>';
+  }
+  
+  // Update upload zone to show file loaded state
+  if (uploadZone) {
+    uploadZone.classList.add('has-file');
+    uploadZone.innerHTML = `
+      <span class="upload-icon">✅</span>
+      <h2 class="upload-title">${escapeHtml(AppState.fileName || 'Arquivo carregado')}</h2>
+      <p class="upload-subtitle">Clique para carregar outro arquivo</p>
+      <input type="file" id="fileInput" class="file-input" accept=".ofx">
+    `;
+    // Re-attach event listener
+    setupUploadZone();
+  }
   
   container.innerHTML = '';
   const metadata = AppState.ofxData.metadata;
   
-  // Define cards with icons
+  // Define cards with icons - compact for dashboard
   const cards = [
     {
       icon: '🏦',
       label: 'Banco',
       value: metadata.bankName || 'N/A',
-      subvalue: metadata.bankId ? `Código: ${metadata.bankId}` : null,
+      subvalue: metadata.bankId ? `ID: ${metadata.bankId}` : null,
     },
     {
       icon: '💳',
@@ -2563,7 +2606,7 @@ function renderMetadata() {
       icon: '📅',
       label: 'Período',
       value: metadata.startDate && metadata.endDate 
-        ? `${metadata.startDate} a ${metadata.endDate}`
+        ? `${metadata.startDate} - ${metadata.endDate}`
         : 'N/A',
       subvalue: null,
     },
@@ -2571,14 +2614,14 @@ function renderMetadata() {
       icon: '💰',
       label: 'Saldo',
       value: metadata.balance != null ? formatCurrency(metadata.balance) : 'N/A',
-      subvalue: metadata.balanceDate ? `Atualizado em ${metadata.balanceDate}` : null,
+      subvalue: metadata.balanceDate ? metadata.balanceDate : null,
       highlight: metadata.balance != null,
       isBalance: true,
     },
     {
       icon: '💵',
       label: 'Moeda',
-      value: metadata.currency || 'N/A',
+      value: metadata.currency || 'BRL',
       subvalue: null,
     },
   ];
@@ -2586,7 +2629,9 @@ function renderMetadata() {
   // Create cards
   for (const card of cards) {
     const cardEl = document.createElement('div');
-    cardEl.className = 'metadata-card';
+    let cardClass = 'info-card';
+    if (card.highlight) cardClass += ' highlight';
+    cardEl.className = cardClass;
     
     // Icon
     const icon = document.createElement('div');
@@ -2624,51 +2669,60 @@ function renderMetadata() {
 }
 
 /**
- * Render transaction table
+ * Render transaction list (scrollable)
  */
 function renderTransactions() {
-  const tbody = document.getElementById('transactionTableBody');
-  const countText = document.getElementById('countText');
+  const list = document.getElementById('transactionList');
+  const countElement = document.getElementById('transactionCount');
+  const bottomSection = document.getElementById('bottomSection');
+  const listContainer = document.getElementById('listContainer');
   
-  if (!tbody || !AppState.ofxData) return;
+  if (!list || !AppState.ofxData) return;
   
-  tbody.innerHTML = '';
+  // Make sure bottom section is visible
+  if (bottomSection) {
+    bottomSection.style.display = 'flex';
+  }
+  
+  list.innerHTML = '';
   const transactions = AppState.ofxData.transactions;
   
   // Update count
-  if (countText) {
+  if (countElement) {
     const count = transactions.length;
-    countText.textContent = `${count} transação${count !== 1 ? 'ões' : ''}`;
+    countElement.innerHTML = `<span>${count}</span> transação${count !== 1 ? 'ões' : ''}`;
   }
   
-  // Create rows with staggered animation
+  // Create list items
   transactions.forEach((transaction, index) => {
-    const row = document.createElement('tr');
+    const item = document.createElement('li');
+    item.className = 'transaction-item';
     
-    // Add staggered animation delay (max 30 for performance)
-    const delay = Math.min(index * 0.02, 0.6);
-    row.style.animationDelay = `${delay}s`;
+    // Add staggered animation delay (max 20 for performance)
+    const delay = Math.min(index * 0.015, 0.3);
+    item.style.animationDelay = `${delay}s`;
     
-    // Date cell
-    const dateCell = document.createElement('td');
-    dateCell.className = 'date-cell';
-    dateCell.textContent = transaction.date;
-    row.appendChild(dateCell);
+    // Date
+    const dateEl = document.createElement('span');
+    dateEl.className = 'transaction-date';
+    dateEl.textContent = transaction.date;
+    item.appendChild(dateEl);
     
-    // Amount cell
-    const amountCell = document.createElement('td');
+    // Amount
+    const amountEl = document.createElement('span');
     const amountClass = transaction.amount >= 0 ? 'credit' : 'debit';
-    amountCell.className = `amount-cell ${amountClass}`;
-    amountCell.textContent = formatCurrency(transaction.amount);
-    row.appendChild(amountCell);
+    amountEl.className = `transaction-amount ${amountClass}`;
+    amountEl.textContent = formatCurrency(transaction.amount);
+    item.appendChild(amountEl);
     
-    // Description cell
-    const descCell = document.createElement('td');
-    descCell.className = 'description-cell';
-    descCell.textContent = transaction.description;
-    row.appendChild(descCell);
+    // Description
+    const descEl = document.createElement('span');
+    descEl.className = 'transaction-description';
+    descEl.textContent = transaction.description;
+    descEl.title = transaction.description; // Tooltip for overflow
+    item.appendChild(descEl);
     
-    tbody.appendChild(row);
+    list.appendChild(item);
   });
 }
 
@@ -2677,43 +2731,43 @@ function renderTransactions() {
 // ═══════════════════════════════════════════════════════════
 
 /**
- * Set up all event listeners
+ * Set up upload zone event listeners (called after DOM is ready and after upload zone is re-rendered)
  */
-function setupEventListeners() {
+function setupUploadZone() {
   const uploadZone = document.getElementById('uploadZone');
   const fileInput = document.getElementById('fileInput');
   
   if (!uploadZone || !fileInput) {
-    throw new Error('Required DOM elements not found');
+    return;
   }
   
   // Upload zone click
-  uploadZone.addEventListener('click', safeHandler(function() {
+  uploadZone.onclick = function() {
     fileInput.click();
-  }));
+  };
   
   // File input change
-  fileInput.addEventListener('change', safeHandler(function(e) {
+  fileInput.onchange = function(e) {
     const file = e.target.files[0];
     if (file) {
       handleFileUpload(file);
     }
     // Reset input so same file can be selected again
     e.target.value = '';
-  }));
+  };
   
   // Drag and drop
-  uploadZone.addEventListener('dragover', safeHandler(function(e) {
+  uploadZone.ondragover = function(e) {
     e.preventDefault();
     uploadZone.classList.add('dragover');
-  }));
+  };
   
-  uploadZone.addEventListener('dragleave', safeHandler(function(e) {
+  uploadZone.ondragleave = function(e) {
     e.preventDefault();
     uploadZone.classList.remove('dragover');
-  }));
+  };
   
-  uploadZone.addEventListener('drop', safeHandler(function(e) {
+  uploadZone.ondrop = function(e) {
     e.preventDefault();
     uploadZone.classList.remove('dragover');
     
@@ -2721,7 +2775,14 @@ function setupEventListeners() {
     if (file) {
       handleFileUpload(file);
     }
-  }));
+  };
+}
+
+/**
+ * Set up all event listeners (initial setup)
+ */
+function setupEventListeners() {
+  setupUploadZone();
 }
 
 // ═══════════════════════════════════════════════════════════
