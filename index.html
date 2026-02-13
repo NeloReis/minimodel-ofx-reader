@@ -667,7 +667,8 @@ h1, h2, h3, h4, h5, h6 {
   height: 0;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(25, 118, 210, 0.2) 0%, transparent 70%);
-  transition: width var(--transition-slow), height var(--transition-slow);
+  transition: all var(--transition-slow);
+  opacity: 0;
 }
 
 .upload-zone:hover,
@@ -688,8 +689,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .upload-zone:hover::after,
 .upload-zone.dragover::after {
-  width: 600px;
-  height: 600px;
+  width: 400px;
+  height: 400px;
+  opacity: 1;
 }
 
 .upload-zone.has-file {
@@ -703,16 +705,16 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
 }
 
-/* Animated gradient border using border-image */
+/* Animated gradient border - smooth loop */
 .upload-zone.has-file::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: var(--radius-2xl);
   padding: 2px;
-  background: linear-gradient(135deg, #00e5ff, #1976d2, #a855f7, #00e5ff);
-  background-size: 300% 300%;
-  animation: gradientBorderMove 3s ease infinite;
+  background: linear-gradient(135deg, #00e5ff 0%, #1976d2 33%, #a855f7 66%, #00e5ff 100%);
+  background-size: 400% 400%;
+  animation: gradientBorderMove 4s linear infinite;
   -webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
     linear-gradient(#fff 0 0);
@@ -726,8 +728,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @keyframes gradientBorderMove {
   0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 .upload-zone.has-file::after {
