@@ -64,8 +64,8 @@
   --text-primary: #e3f2fd;
   --text-secondary: #90caf9;
   --text-tertiary: #64b5f6;
-  --text-muted: #3d5a73;
-  --text-inverse: #030810;
+  --text-muted: #5a7a99;
+  --text-inverse: #0a1929;
 
   /* ── Accent & Brand Colors ── */
   --accent: #1976d2;
@@ -83,25 +83,6 @@
   /* ── Enhanced Gradients ── */
   --gradient-accent: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
   --gradient-neon: linear-gradient(135deg, #00e5ff 0%, #1976d2 50%, #a855f7 100%);
-  --gradient-header: linear-gradient(135deg, #050d18 0%, #081625 100%);
-
-  /* ── Text Colors ── */
-  --text-primary: #e3f2fd;
-  --text-secondary: #90caf9;
-  --text-tertiary: #64b5f6;
-  --text-muted: #5a7a99;
-  --text-inverse: #0a1929;
-
-  /* ── Accent & Brand Colors ── */
-  --accent: #1976d2;
-  --accent-rgb: 25, 118, 210;
-  --accent-light: #42a5f5;
-  --accent-lighter: #64b5f6;
-  --accent-dark: #1565c0;
-  --accent-darkest: #0d47a1;
-  
-  /* ── Enhanced Gradients ── */
-  --gradient-accent: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
   --gradient-header: linear-gradient(135deg, #0d1b2a 0%, #132f4c 100%);
 
   /* ── Semantic Colors ── */
@@ -2291,11 +2272,19 @@ function parseTransaction(block) {
     }
   }
   
+  // Build ISO date for sorting/charting (PCD Section 5.4)
+  const cleanDate = dateRaw.split('[')[0].substring(0, 8);
+  const isoDate = cleanDate.substring(0, 4) + '-' + cleanDate.substring(4, 6) + '-' + cleanDate.substring(6, 8);
+  
+  const trimmedMemo = memo.trim();
+  
   return {
     type,
     date,
+    dateRaw: isoDate,
     amount,
-    description: memo.trim(),
+    description: trimmedMemo,
+    memo: trimmedMemo,
   };
 }
 
@@ -2759,12 +2748,16 @@ function renderStatsCards(stats) {
 }
 
 /**
- * Get month label from date string
+ * Get month label from ISO date string (YYYY-MM-DD)
+ * PCD Bug 2 fix: parse ISO format directly instead of new Date()
  */
 function getMonthLabel(dateStr) {
-  const date = new Date(dateStr);
+  if (!dateStr || typeof dateStr !== 'string') return 'N/A';
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-  return months[date.getMonth()];
+  // dateStr is ISO format YYYY-MM-DD
+  const monthIndex = parseInt(dateStr.substring(5, 7), 10) - 1;
+  if (monthIndex < 0 || monthIndex > 11) return 'N/A';
+  return months[monthIndex];
 }
 
 /**
@@ -2935,9 +2928,9 @@ function renderBalanceChart(transactions) {
     chartInstances.balance.destroy();
   }
   
-  // Sort by date
+  // Sort by date using ISO dateRaw for correct ordering (PCD Bug 3 fix)
   const sorted = [...transactions].sort((a, b) =>
-    new Date(a.dateRaw) - new Date(b.dateRaw)
+    (a.dateRaw || '').localeCompare(b.dateRaw || '')
   );
   
   // Calculate running balance
@@ -3076,6 +3069,36 @@ function renderDailySummaryChart(transactions) {
 }
 
 /**
+ * Create a single transaction list item (shared helper — PCD Bug 5 fix)
+ */
+function createTransactionItem(transaction, index) {
+  const item = document.createElement('li');
+  item.className = 'transaction-item';
+  item.style.animationDelay = `${index * 0.02}s`;
+  item.classList.add('animate-in');
+  
+  const dateEl = document.createElement('span');
+  dateEl.className = 'transaction-date';
+  dateEl.textContent = transaction.date;
+  item.appendChild(dateEl);
+  
+  const amountEl = document.createElement('span');
+  const amountClass = transaction.amount >= 0 ? 'credit' : 'debit';
+  amountEl.className = `transaction-amount ${amountClass}`;
+  amountEl.textContent = formatCurrency(transaction.amount);
+  item.appendChild(amountEl);
+  
+  const desc = transaction.description || transaction.memo || 'Sem descrição';
+  const descEl = document.createElement('span');
+  descEl.className = 'transaction-description';
+  descEl.textContent = desc;
+  descEl.title = desc;
+  item.appendChild(descEl);
+  
+  return item;
+}
+
+/**
  * Render transaction list (scrollable)
  */
 function renderTransactions() {
@@ -3104,30 +3127,7 @@ function renderTransactions() {
   
   // Create list items with staggered animation
   transactions.forEach((transaction, index) => {
-    const item = document.createElement('li');
-    item.className = 'transaction-item';
-    // Stagger animation - all items get animation with increasing delay
-    item.style.animationDelay = `${index * 0.02}s`;
-    item.classList.add('animate-in');
-    
-    const dateEl = document.createElement('span');
-    dateEl.className = 'transaction-date';
-    dateEl.textContent = transaction.date;
-    item.appendChild(dateEl);
-    
-    const amountEl = document.createElement('span');
-    const amountClass = transaction.amount >= 0 ? 'credit' : 'debit';
-    amountEl.className = `transaction-amount ${amountClass}`;
-    amountEl.textContent = formatCurrency(transaction.amount);
-    item.appendChild(amountEl);
-    
-    const descEl = document.createElement('span');
-    descEl.className = 'transaction-description';
-    descEl.textContent = transaction.description;
-    descEl.title = transaction.description;
-    item.appendChild(descEl);
-    
-    list.appendChild(item);
+    list.appendChild(createTransactionItem(transaction, index));
   });
 }
 
@@ -3222,13 +3222,13 @@ function filterTransactions(searchTerm, sortOrder) {
     );
   }
   
-  // Sort transactions
+  // Sort transactions — use ISO dateRaw for string comparison (PCD Bug 3 fix)
   transactions.sort((a, b) => {
     switch (sortOrder) {
       case 'date-asc':
-        return new Date(a.dateRaw) - new Date(b.dateRaw);
+        return (a.dateRaw || '').localeCompare(b.dateRaw || '');
       case 'date-desc':
-        return new Date(b.dateRaw) - new Date(a.dateRaw);
+        return (b.dateRaw || '').localeCompare(a.dateRaw || '');
       case 'amount-asc':
         return a.amount - b.amount;
       case 'amount-desc':
@@ -3251,7 +3251,7 @@ function filterTransactions(searchTerm, sortOrder) {
 }
 
 /**
- * Render filtered transactions
+ * Render filtered transactions (uses shared createTransactionItem helper)
  */
 function renderFilteredTransactions(transactions) {
   const list = document.getElementById('transactionList');
@@ -3260,28 +3260,7 @@ function renderFilteredTransactions(transactions) {
   list.innerHTML = '';
   
   transactions.forEach((transaction, index) => {
-    const item = document.createElement('li');
-    item.className = 'transaction-item';
-    item.style.animationDelay = `${index * 0.02}s`;
-    item.classList.add('animate-in');
-    
-    const dateEl = document.createElement('span');
-    dateEl.className = 'transaction-date';
-    dateEl.textContent = transaction.date;
-    item.appendChild(dateEl);
-    
-    const amountEl = document.createElement('span');
-    const amountClass = transaction.amount >= 0 ? 'credit' : 'debit';
-    amountEl.className = `transaction-amount ${amountClass}`;
-    amountEl.textContent = formatCurrency(transaction.amount);
-    item.appendChild(amountEl);
-    
-    const descEl = document.createElement('span');
-    descEl.className = 'transaction-description';
-    descEl.textContent = transaction.memo || 'Sem descrição';
-    item.appendChild(descEl);
-    
-    list.appendChild(item);
+    list.appendChild(createTransactionItem(transaction, index));
   });
 }
 
@@ -3290,47 +3269,12 @@ function renderFilteredTransactions(transactions) {
 // ═══════════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('[DEBUG] DOMContentLoaded fired');
-  
   try {
-    console.log('[DEBUG] Step 1: Checking DOM elements...');
-    
-    // Check if key elements exist
-    const elements = {
-      'uploadZone': document.getElementById('uploadZone'),
-      'loadingContainer': document.getElementById('loadingContainer'),
-      'errorMessage': document.getElementById('errorMessage'),
-      'infoSection': document.getElementById('infoSection'),
-      'bottomSection': document.getElementById('bottomSection'),
-      'headerStatus': document.getElementById('headerStatus'),
-      'analyticsSection': document.getElementById('analyticsSection'),
-      'filterBar': document.getElementById('filterBar')
-    };
-    
-    console.log('[DEBUG] DOM elements found:', Object.keys(elements).filter(k => elements[k]));
-    console.log('[DEBUG] DOM elements MISSING:', Object.keys(elements).filter(k => !elements[k]));
-    
-    console.log('[DEBUG] Step 2: Calling updateState...');
     updateState({ status: 'initial' });
-    console.log('[DEBUG] Step 2: updateState complete');
-    
-    console.log('[DEBUG] Step 3: Calling setupEventListeners...');
     setupEventListeners();
-    console.log('[DEBUG] Step 3: setupEventListeners complete');
-    
-    console.log('[DEBUG] Step 4: Checking libraries...');
-    console.log('[DEBUG] - gsap:', typeof gsap !== 'undefined' ? 'LOADED' : 'NOT LOADED');
-    console.log('[DEBUG] - Chart:', typeof Chart !== 'undefined' ? 'LOADED' : 'NOT LOADED');
-    console.log('[DEBUG] - phosphor icons:', document.querySelector('link[href*="phosphor"]') ? 'LOADED' : 'NOT LOADED');
-    
-    console.log('[DEBUG] Step 5: GSAP animations DISABLED for now');
-    console.log('[DEBUG] Skipping GSAP to fix visibility issue');
-    
-    console.log('[DEBUG] Initialization complete!');
     console.log('[OFX Reader] Application initialized successfully');
   } catch (error) {
-    console.error('[DEBUG] ERROR in initialization:', error);
-    console.error('[DEBUG] Stack:', error.stack);
+    console.error('[OFX Reader] Initialization failed:', error);
     document.body.innerHTML = '<div style="color: #f44336; padding: 2rem; text-align: center; font-family: sans-serif;"><h1>Failed to start application</h1><p>Please refresh the page. If the problem persists, check the browser console for details.</p></div>';
   }
 });
