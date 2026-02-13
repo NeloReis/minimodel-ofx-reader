@@ -2227,11 +2227,9 @@ function renderTransactions() {
   transactions.forEach((transaction, index) => {
     const item = document.createElement('li');
     item.className = 'transaction-item';
-    // Stagger animation: max 15 items get delayed animation
-    if (index < 15) {
-      item.style.animationDelay = `${0.05 + index * 0.03}s`;
-      item.classList.add('animate-in');
-    }
+    // Stagger animation - all items get animation with increasing delay
+    item.style.animationDelay = `${index * 0.02}s`;
+    item.classList.add('animate-in');
     
     const dateEl = document.createElement('span');
     dateEl.className = 'transaction-date';
