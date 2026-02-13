@@ -1806,6 +1806,25 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* ── Analytics Responsive Overrides ──
+   These MUST come after the base .analytics-section / .filter-bar rules
+   above, otherwise the base grid-column: 2 wins over media-query rules
+   due to CSS source-order cascade.
+   ─────────────────────────────────── */
+@media (max-width: 1024px) {
+  .analytics-section,
+  .analytics-section.visible {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .filter-bar,
+  .filter-bar.visible {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
 /* Phosphor Icons Size Overrides */
 i.ph {
   font-size: 1.25em;
