@@ -3176,6 +3176,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }, '-=0.1');
       
       console.log('[DEBUG] GSAP timeline created successfully');
+      
+      // Check visibility after animation
+      setTimeout(function() {
+        var header = document.querySelector('.app-header');
+        var upload = document.querySelector('.upload-zone');
+        console.log('[DEBUG] Post-animation check - Header:', header ? (window.getComputedStyle(header).opacity) : 'NOT FOUND');
+        console.log('[DEBUG] Post-animation check - Upload:', upload ? (window.getComputedStyle(upload).opacity) : 'NOT FOUND');
+      }, 1500);
     } else {
       console.log('[DEBUG] GSAP not available, skipping animations');
     }
